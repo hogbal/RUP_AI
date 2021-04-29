@@ -1,0 +1,3 @@
+
+
+docker run --gpus all -it --rm -v /home/hogbal/RUP/object_detection/workspace:/RUP/workspace -p 6006:6006 hogbal/rup:2.5.0rc2
