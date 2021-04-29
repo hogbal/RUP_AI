@@ -1,3 +1,6 @@
 dataset/
 
 *.record
+
+object_detection/workspace/training_rup/pre-trained-models/**/checkpoint/
+object_detection/workspace/training_rup/pre-trained-models/**/saved_model/
