@@ -6,6 +6,7 @@ RUN apt-get update -y && \
 	apt-get upgrade -y && \
 	apt-get install python3-dev && \
 	apt-get install git -y && \
+	apt-get install libgl1-mesa-glx && \
 	python3 -m pip install --upgrade pip && \
 	pip3 install cython &&\
 	apt install protobuf-compiler -y && \
