@@ -2,6 +2,8 @@ dataset/
 
 *.record
 
+object_detection/workspace/training_rup/.ipynb_checkpoints/
+
 object_detection/workspace/training_rup/exported-models/*
 !object_detection/workspace/training_rup/exported-models/README.md
 !object_detection/workspace/training_rup/exportex-models/images/
