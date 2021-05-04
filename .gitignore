@@ -1,5 +1,4 @@
-dataset/
-pytorch/dataset/
+**/dataset/
 
 *.record
 
