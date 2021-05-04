@@ -2,17 +2,17 @@ dataset/
 
 *.record
 
-object_detection/workspace/training_rup/.ipynb_checkpoints/
+tensorflow/object_detection/workspace/training_rup/.ipynb_checkpoints/
 
-object_detection/workspace/training_rup/exported-models/*
-!object_detection/workspace/training_rup/exported-models/images/*
-!object_detection/workspace/training_rup/exported-models/README.md
+tensorflow/object_detection/workspace/training_rup/exported-models/*
+!tensorflow/object_detection/workspace/training_rup/exported-models/images/*
+!tensorflow/object_detection/workspace/training_rup/exported-models/README.md
 
-object_detection/workspace/training_rup/mobile/*
-!object_detection/workspace/training_rup/mobile/README.md
+tensorflow/object_detection/workspace/training_rup/mobile/*
+!tensorflow/object_detection/workspace/training_rup/mobile/README.md
 
-object_detection/workspace/training_rup/models/*
-!object_detection/workspace/training_rup/models/README.md
+tensorflow/object_detection/workspace/training_rup/models/*
+!tensorflow/object_detection/workspace/training_rup/models/README.md
 
-object_detection/workspace/training_rup/pre-trained-models/*
-!object_detection/workspace/training_rup/pre-trained-models/README.md
+tensorflow/object_detection/workspace/training_rup/pre-trained-models/*
+!tensorflow/object_detection/workspace/training_rup/pre-trained-models/README.md
