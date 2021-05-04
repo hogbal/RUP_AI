@@ -12,6 +12,6 @@ docker run --gpus all -it --rm -v [local path]:/RUP/workspace -p 6006:6006 -p 88
 ## Dockerfile table
 |Tag|summary|Dockerfile|
 |:---:|:---:|:------:|
-|2.5.0rc1|using tensorflow/tensorflow:2.5.0rc1-gpu-jupyter image|[2.5.0rc1 Dockerfile](https://github.com/hogbal/RUP/blob/master/docker/2.5.0rc1/Dockerfile)|
-|2.5.0rc2|using tensorflow/tensorflow:2.5.0rc2-gpu-jupyter image|[2.5.0rc2 Dockerfile](https://github.com/hogbal/RUP/blob/master/docker/2.5.0rc2/Dockerfile)|
+|2.5.0rc1|using tensorflow/tensorflow:2.5.0rc1-gpu-jupyter image|[2.5.0rc1 Dockerfile](https://github.com/hogbal/RUP/blob/master/docker/tf2.5.0rc1/Dockerfile)|
+|2.5.0rc2|using tensorflow/tensorflow:2.5.0rc2-gpu-jupyter image|[2.5.0rc2 Dockerfile](https://github.com/hogbal/RUP/blob/master/docker/tf2.5.0rc2/Dockerfile)|
 
