@@ -1,6 +1,7 @@
 **/dataset/
 **/input/
 **/output/
+**/.ipynb_checkpoints
 
 *.record
 
