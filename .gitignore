@@ -1,4 +1,6 @@
 **/dataset/
+**/input/
+**/output/
 
 *.record
 
