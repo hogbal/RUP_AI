@@ -12,6 +12,8 @@ RUN apt-get update -y && \
 	apt install protobuf-compiler -y && \
 	mkdir /RUP
 
+RUN mv /usr/local/cuda/lib64/libcusolver.so.11 /usr/local/cuda/lib64/libcusolver.so.10
+
 WORKDIR /RUP
 
 
