@@ -1,13 +1,15 @@
 # RUP object detection docker
 
-This is a docker image with Tensorflow 2 object detection API installed.
+object detection을 하기위한 docker image입니다.
 
-Pull image from [docker hub](https://hub.docker.com/repository/docker/hogbal/rup)
+tensorflow는 tensorflow2 object detection API를 이용하였습니다.
+
+docker image는 [docker hub](https://hub.docker.com/repository/docker/hogbal/rup)를 참고하세요.
 
 
 ## docker run
 ```
-docker run --gpus all -it --rm -v [local path]:/RUP/workspace -p 6006:6006 -p 8888:8888 hogbal/rup:2.5.0rc2
+docker run --gpus all -it --rm -v [local path]:/RUP/workspace -p 6006:6006 -p 8888:8888 hogbal/rup:[tag]
 ```
 ## Dockerfile table
 |Tag|summary|Dockerfile|
