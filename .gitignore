@@ -3,7 +3,7 @@
 **/output/
 **/.ipynb_checkpoints
 
-*.record
+*.tfrecord
 
 tensorflow/object_detection/workspace/training_rup/.ipynb_checkpoints/
 
