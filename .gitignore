@@ -1,9 +1,9 @@
 **/dataset/
 **/input/
 **/output/
-**/darknet/
 **/.ipynb_checkpoints
 **/detect.tflite
+**/pre-trained-weights/
 
 *.tfrecord
 
