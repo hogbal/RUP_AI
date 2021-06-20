@@ -4,6 +4,7 @@
 **/pre-trained-weights/
 **/train/
 **/test/
+**/cuda/
 **/.ipynb_checkpoints
 **/detect.tflite
 
