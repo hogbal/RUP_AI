@@ -1,9 +1,11 @@
 **/dataset/
 **/input/
 **/output/
+**/pre-trained-weights/
+**/train/
+**/test/
 **/.ipynb_checkpoints
 **/detect.tflite
-**/pre-trained-weights/
 
 *.tfrecord
 
