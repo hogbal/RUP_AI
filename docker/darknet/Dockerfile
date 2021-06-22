@@ -110,9 +110,16 @@ WORKDIR build_release
 RUN cmake ..
 RUN cmake --build . --target install --parallel 8
 
+#tensorflow-yolov4-tflite
+WORKDIR /tf
+RUN git clone https://github.com/hunglc007/tensorflow-yolov4-tflite.git
+
+WORKDIR /tf/tensorflow-yolov4-tflite
+RUN pip3 install -r requirements-gpu.txt
+
 #setting vim && tmux
-COPY vimrc ~/.vimrc
-COPY tmux.conf ~/.tmux.conf
+COPY vimrc /root/.vimrc
+COPY tmux.conf /root/.tmux.conf
 
 #install oh my zsh
 RUN chsh -s /usr/bin/zsh && \
