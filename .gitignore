@@ -6,7 +6,7 @@
 **/test/
 **/cuda/
 **/.ipynb_checkpoints
-**/detect.tflite
+**/*.tflite
 **/*.weights
 **/tf/
 **/tflite/
