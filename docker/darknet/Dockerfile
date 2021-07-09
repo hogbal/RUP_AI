@@ -18,6 +18,7 @@ RUN apt-get update && \
 	apt-get install zsh -y && \
 	apt-get install tmux -y && \
 	apt-get install vim -y && \
+	apt install libcanberra-gtk-module libcanberra-gtk3-module -y && \
 	apt install libssl-dev -y && \
 	apt install fonts-powerline
 
@@ -128,6 +129,9 @@ RUN chsh -s /usr/bin/zsh && \
 	git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting && \
 	git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions && \
 	sed -i 's/plugins=(git)/plugins=(git zsh-syntax-highlighting zsh-autosuggestions)/' ~/.zshrc
+
+#setting gui
+ENV NO_AT_BRIDGE=1
 	
 COPY cfg/yolov4-obj.cfg /tf/darknet/cfg/yolov4-obj.cfg
 COPY data/obj.names /tf/darknet/build/darknet/x64/data/obj.names
