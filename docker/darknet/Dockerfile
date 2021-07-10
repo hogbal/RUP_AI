@@ -133,12 +133,12 @@ RUN chsh -s /usr/bin/zsh && \
 #setting gui
 ENV NO_AT_BRIDGE=1
 	
-COPY cfg/yolov4-obj.cfg /tf/darknet/cfg/yolov4-obj.cfg
+COPY cfg/ /tf/darknet/cfg/
 COPY data/obj.names /tf/darknet/build/darknet/x64/data/obj.names
 COPY data/obj.data /tf/darknet/build/darknet/x64/data/obj.data
 COPY data/train.txt /tf/darknet/build/darknet/x64/data/train.txt
 COPY data/test.txt /tf/darknet/build/darknet/x64/data/test.txt
-COPY pre-trained-weights/yolov4.conv.137 /tf/darknet/build/darknet/x64/yolov4.conv.137
+COPY pre-trained-weights/ /tf/darknet/build/darknet/x64/
 
 WORKDIR /tf/darknet
 CMD ["zsh"]
