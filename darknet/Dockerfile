@@ -133,7 +133,7 @@ RUN chsh -s /usr/bin/zsh && \
 #setting gui
 ENV NO_AT_BRIDGE=1
 	
-RUN mkdir /workspace
+RUN mkdir -p /workspace/backup
 
 COPY setting/ /workspace/setting/
 COPY train_data/ /workspace/data/
