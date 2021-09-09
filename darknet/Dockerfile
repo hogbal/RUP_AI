@@ -136,7 +136,7 @@ ENV NO_AT_BRIDGE=1
 RUN mkdir -p /workspace/backup
 
 COPY setting/ /workspace/setting/
-COPY train_data/ /workspace/data/
+COPY data/ /workspace/data/
 COPY predict/ /workspace/predict/
 
 WORKDIR /tf/darknet
