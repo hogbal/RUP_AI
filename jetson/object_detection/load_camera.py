@@ -5,7 +5,7 @@ def gstreamer_pipeline(
 		capture_height=640,
 		display_width=640,
 		display_height=640,
-		framerate=60,
+		framerate=30,
 		flip_method=0,
 		):
 	return ("nvarguscamerasrc ! "
@@ -28,4 +28,5 @@ def gstreamer_pipeline(
 
 def csi_camera():
 	cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=2), cv2.CAP_GSTREAMER)
+	cap.set(cv2.CAP_PROP_BUFFERSIZE, 0)
 	return cap
