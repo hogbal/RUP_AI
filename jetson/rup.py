@@ -40,6 +40,7 @@ time.sleep(0.5)
 os.system('clear')
 
 def menu():
+	print('F : Full Flow')
 	print('S : Starting Object Detection')
 	print('F : Firebase Update')
 	print('Q : QRcode')
@@ -49,27 +50,31 @@ while(True):
 	menu()
 	cup_check = input('select : ')
 
-	if(cup_check == 'S'):
+	if(cup_check == 'F'):
 		print('[DEBUG] Find Cup')
 		print('[DEBUG] Starting Object Detection...')
+		if(args.debug):
+			detect = loop_detect.yolov4_tiny_cv2(model, cap_object_detection)
+		else:
+			detect = loop_detect.yolov4_tiny_log(model, cap_object_detection)
 
+		if(detect):
+			print('[DEBUG] Find recycling code')
+			user_email = qrscanner.scan_img('QRscanner/qrcode.png')
+			if(user_email):
+				print('[DEBUG] User Email QRcode scan success')
+				print('[DEBUG] Update Firebase')
+				firebase_rup.firebase_update(user_email)
+
+	elif(cup_check == 'S'):
 		if(args.debug):
 			firebase_update = loop_detect.yolov4_tiny_cv2(model, cap_object_detection)
 		else:
 			firebase_update = loop_detect.yolov4_tiny_log(model, cap_object_detection)
-
-		if(firebase_update):
-			print('[DEBUG] Find recycling code')
-			print('[DEBUG] Update Firebase')
-			firebase_rup.firebase_update()
 	elif(cup_check == 'F'):
-		print('[DEBUG] Update Firebase')
 		firebase_rup.firebase_update()
 	elif(cup_check == 'Q'):
-		print('[DEBUG] QRcode Test')
 		qrscanner.scan_img('QRscanner/qrcode.png')
-		
-
 	elif(cup_check == 'E'):
 		break
 	else:

@@ -2,7 +2,7 @@ from firebase_admin import credentials
 from firebase_admin import db
 from firebase_admin import auth
 
-def firebase_update():
+def firebase_update(user_email):
 	uid = "5aefF22EfVdWslKaWQ7CSZecUjW2"
 	if db.reference('Users2').get().get(uid):
 		user = db.reference('Users2/'+uid)
