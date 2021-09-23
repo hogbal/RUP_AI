@@ -11,6 +11,7 @@ from firebase_admin import auth
 from QRscanner import qrscanner
 from object_detection import load_model, load_camera, loop_detect
 from firebase_rup import firebase_rup
+from arduino import serial_connect
 
 
 def str2bool(v):
@@ -44,6 +45,7 @@ def menu():
 	print('S : Starting Object Detection')
 	print('F : Firebase Update')
 	print('Q : QRcode')
+	print('A : Arduino')
 	print('E : Exit')
 
 while(True):
@@ -75,6 +77,8 @@ while(True):
 		firebase_rup.firebase_update()
 	elif(cup_check == 'Q'):
 		qrscanner.scan_img('QRscanner/qrcode.png')
+	elif(cup_check == 'A'):
+		print('test')
 	elif(cup_check == 'E'):
 		break
 	else:
