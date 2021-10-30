@@ -31,9 +31,9 @@ args = parser.parse_args()
 model = load_model.YOLOv4Tiny(weight_file='model/yolov4-tiny_fp32.rt')
 cap_object_detection = load_camera.csi_camera()
 
-cred = credentials.Certificate("firebase_sdk/reduce-the-use-of-plastic-firebase-adminsdk-7r0al-d13b6f66fe.json")
+cred = credentials.Certificate("firebase_sdk/rup-ver2-81b50-firebase-adminsdk-tuwg4-592225897b.json")
 default_app = firebase_admin.initialize_app(cred,{
-	'databaseURL' : 'https://reduce-the-use-of-plastic-default-rtdb.firebaseio.com/'
+	'databaseURL' : 'https://rup-ver2-81b50-default-rtdb.firebaseio.com/'
 })
 
 print('Setting success!')
@@ -43,7 +43,7 @@ os.system('clear')
 def menu():
 	print('F : Full Flow')
 	print('S : Starting Object Detection')
-	print('F : Firebase Update')
+	print('U : Firebase Update')
 	print('Q : QRcode')
 	print('A : Arduino')
 	print('E : Exit')
@@ -73,8 +73,8 @@ while(True):
 			firebase_update = loop_detect.yolov4_tiny_cv2(model, cap_object_detection)
 		else:
 			firebase_update = loop_detect.yolov4_tiny_log(model, cap_object_detection)
-	elif(cup_check == 'F'):
-		firebase_rup.firebase_update()
+	elif(cup_check == 'U'):
+		firebase_rup.firebase_update('vdeshrtp7nwwrl5lx5jc5lwmdax1')
 	elif(cup_check == 'Q'):
 		qrscanner.scan_img('QRscanner/qrcode.png')
 	elif(cup_check == 'A'):

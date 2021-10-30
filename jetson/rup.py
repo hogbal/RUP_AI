@@ -13,25 +13,20 @@ from object_detection import load_model, load_camera, loop_detect
 from firebase_rup import firebase_rup
 #from arduino import serial_connect
 
-'''
 ser_main = serial.Serial(
 		port = '/dev/ttyACM0',
 		baudrate=9600)
 
 ser_sub = serial.Serial(
 		port = '/dev/ttyUSB0',
-		baudrate=9600)
-'''
-ser_main = serial.Serial(
-		port = '/dev/ttyUSB0',
-		baudrate = 9600)
+		baudrate=19200)
 
 model = load_model.YOLOv4Tiny(weight_file='model/yolov4-tiny_fp32.rt')
 cap_object_detection = load_camera.csi_camera()
 
-cred = credentials.Certificate("firebase_sdk/reduce-the-use-of-plastic-firebase-adminsdk-7r0al-d13b6f66fe.json")
+cred = credentials.Certificate("firebase_sdk/rup-ver2-81b50-firebase-adminsdk-tuwg4-592225897b.json")
 default_app = firebase_admin.initialize_app(cred,{
-	'databaseURL' : 'https://reduce-the-use-of-plastic-default-rtdb.firebaseio.com/'
+	'databaseURL' : 'https://rup-ver2-81b50-default-rtdb.firebaseio.com/'
 })
 
 print('Setting success!')
@@ -40,8 +35,8 @@ os.system('clear')
 
 while(True):
 	if(ser_main.readable()):
-		res = ser_main.readline()
-		read_data = res.decode()[:len(res)-1]
+		main_res = ser_main.readline()
+		read_data = main_res.decode()[:len(main_res)-1]
 		if(read_data == 'Detection\r'):
 			print("Detection start")
 			detect = loop_detect.yolov4_tiny_log(model, cap_object_detection)
@@ -58,3 +53,19 @@ while(True):
 
 			if(detect):
 				ser_main.write(detect.encode("utf-8"))
+				ser_sub.write(detect.encode("utf-8"))
+				
+				print("QR scanner start")
+				while(True):
+					if(ser_sub.readable()):
+						sub_res = ser_sub.readline()
+						qr_data = sub_res.decode()[:len(sub_res)-1][:-1]
+						print(qr_data.encode())
+
+						print("Firebase start")
+						firebase_rup.firebase_update(qr_data)
+						break
+				print("QR scanner end")
+
+
+
