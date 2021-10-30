@@ -38,11 +38,11 @@ try:
 	get_network_boxes = lib.get_network_boxes
 	get_network_boxes.argtypes = [c_void_p, c_float, c_int, POINTER(c_int)]
 	get_network_boxes.restype = POINTER(DETECTION)
+    
 except:
 	print('tkdnn libary load error!!')
 	print("Unexpected error:", sys.exc_info()[0])
 	exit()
-
 
 def detect_image(net, darknet_image, thresh=0.5):
 	num = c_int(0)

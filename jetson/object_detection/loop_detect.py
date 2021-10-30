@@ -7,7 +7,7 @@ def update_check(detections):
 	labels = [det[0] for det in detections]
 	labels = set(labels)
 	if len(labels) == 1:
-		return True
+		return list(labels)[0]
 	else:
 		return False
 
@@ -52,9 +52,11 @@ def yolov4_tiny_cv2(model, cap):
 				img = cv2.rectangle(img, (x0, y0), (x1, y1), color_dic[det_class], 2)
 				img = cv2.putText(img, det_class+" "+prob, (x0, (y0-10)), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color_dic[det_class], 2)
 			video_shower.frame = img
+			
+			result = update_check(detections)
+			if result:
+				return result 
 
-			if update_check(detections):
-				return True
 		cv2.destroyAllWindows()
 		return False
 	else:
@@ -85,9 +87,9 @@ def yolov4_tiny_log(model, cap):
 				prob = str(format(det[1],".2f"))
 				print(det_class+" : "+prob)
 
-			if update_check(detections):
-				return True
-				
+			result = update_check(detections)
+			if result:
+				return result 
 		return False
 	else:
 		print("Unable to open camera")

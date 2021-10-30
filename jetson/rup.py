@@ -1,7 +1,7 @@
 import os
 import cv2
 import time
-import argparse
+import serial
 import firebase_admin
 import Jetson.GPIO as GPIO
 from firebase_admin import credentials
@@ -11,22 +11,20 @@ from firebase_admin import auth
 from QRscanner import qrscanner
 from object_detection import load_model, load_camera, loop_detect
 from firebase_rup import firebase_rup
-from arduino import serial_connect
+#from arduino import serial_connect
 
+'''
+ser_main = serial.Serial(
+		port = '/dev/ttyACM0',
+		baudrate=9600)
 
-def str2bool(v):
-	if isinstance(v, bool):
-		return v
-	if v.lower() in ('yes', 'true', 't', 'y', '1'):
-		return True
-	elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-		return False
-	else:
-		raise argparse.ArgumentTypeError('Boolean value expected.')
-
-parser = argparse.ArgumentParser(description='RUP jetson nano')
-parser.add_argument('--debug', type=str2bool ,default=True)
-args = parser.parse_args()
+ser_sub = serial.Serial(
+		port = '/dev/ttyUSB0',
+		baudrate=9600)
+'''
+ser_main = serial.Serial(
+		port = '/dev/ttyUSB0',
+		baudrate = 9600)
 
 model = load_model.YOLOv4Tiny(weight_file='model/yolov4-tiny_fp32.rt')
 cap_object_detection = load_camera.csi_camera()
@@ -40,50 +38,23 @@ print('Setting success!')
 time.sleep(0.5)
 os.system('clear')
 
-def menu():
-	print('F : Full Flow')
-	print('S : Starting Object Detection')
-	print('F : Firebase Update')
-	print('Q : QRcode')
-	print('A : Arduino')
-	print('E : Exit')
-
 while(True):
-	menu()
-	cup_check = input('select : ')
-
-	if(cup_check == 'F'):
-		print('[DEBUG] Find Cup')
-		print('[DEBUG] Starting Object Detection...')
-		if(args.debug):
-			detect = loop_detect.yolov4_tiny_cv2(model, cap_object_detection)
-		else:
+	if(ser_main.readable()):
+		res = ser_main.readline()
+		read_data = res.decode()[:len(res)-1]
+		if(read_data == 'Detection\r'):
+			print("Detection start")
 			detect = loop_detect.yolov4_tiny_log(model, cap_object_detection)
+			print("met : "+detect)
 
-		if(detect):
-			print('[DEBUG] Find recycling code')
-			user_email = qrscanner.scan_img('QRscanner/qrcode.png')
-			if(user_email):
-				print('[DEBUG] User Email QRcode scan success')
-				print('[DEBUG] Update Firebase')
-				firebase_rup.firebase_update(user_email)
+			if(detect == "pet"):
+				detect = '1'
+			elif(detect == "pp"):
+				detect = '2'
+			elif(detect == "ps"):
+				detect = '3'
+			else:
+				detect = 0
 
-	elif(cup_check == 'S'):
-		if(args.debug):
-			firebase_update = loop_detect.yolov4_tiny_cv2(model, cap_object_detection)
-		else:
-			firebase_update = loop_detect.yolov4_tiny_log(model, cap_object_detection)
-	elif(cup_check == 'F'):
-		firebase_rup.firebase_update()
-	elif(cup_check == 'Q'):
-		qrscanner.scan_img('QRscanner/qrcode.png')
-	elif(cup_check == 'A'):
-		print('test')
-	elif(cup_check == 'E'):
-		break
-	else:
-		print('Error!')
-	time.sleep(0.5)
-	os.system("clear")	
-
-cap_object_detection.release()
+			if(detect):
+				ser_main.write(detect.encode("utf-8"))
