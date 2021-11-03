@@ -4,7 +4,7 @@ services: # 이 항목 밑에 실행하려는 컨테이너 들을 정의 ( 컴�
     image: mysql:5.7 # 사용할 이미지
     restart: always
     command: --lower_case_table_names=1
-    container_name: mysql-test # 컨테이너 이름 설정
+    container_name: mysql-rup # 컨테이너 이름 설정
     ports:
       - "3307:3306" # 접근 포트 설정 (컨테이너 외부:컨테이너 내부)  <- 컨테이너 내부는 무조건 3306
     environment: # -e 옵션
