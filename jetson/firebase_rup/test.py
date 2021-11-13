@@ -12,5 +12,5 @@ default_app = firebase_admin.initialize_app(cred,{
 print(db.reference('User').get().get('02Gz1h2mkq6ffRLLPHDTcMHvBbOb2'))
 for i in range(1000):
 	user = db.reference('User/2Gz1h2mkq6ffRLLPHDTcMHvBbOb2')
-	point = str(int(user.get()['point'])+1)
+	point = int(user.get()['point'])+1
 	user.update({'point':point})

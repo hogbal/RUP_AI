@@ -47,7 +47,6 @@ void setup(){
   pwm.begin();
   pwm.setPWMFreq(51);
 
-  pwm.setPWM(5,0,150);
   pwm.setPWM(4,0,540);
   pwm.setPWM(3,0,250);
   pwm.setPWM(2,0,150);

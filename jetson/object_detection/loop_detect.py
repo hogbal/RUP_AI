@@ -9,7 +9,7 @@ def update_check(detections):
 	if len(labels) == 1:
 		return list(labels)[0]
 	else:
-		return False
+		return 'false'
 
 def yolov4_tiny_cv2(model, cap):
 	color_dic = {
@@ -88,7 +88,7 @@ def yolov4_tiny_log(model, cap):
 				print(det_class+" : "+prob)
 
 			result = update_check(detections)
-			if result:
+			if result != 'false':
 				return result 
 		return False
 	else:

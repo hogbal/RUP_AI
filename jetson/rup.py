@@ -8,7 +8,6 @@ from firebase_admin import credentials
 from firebase_admin import db
 from firebase_admin import auth
 
-from QRscanner import qrscanner
 from object_detection import load_model, load_camera, loop_detect
 from firebase_rup import firebase_rup
 #from arduino import serial_connect
@@ -17,9 +16,6 @@ ser_main = serial.Serial(
 		port = '/dev/ttyACM0',
 		baudrate=9600)
 
-ser_sub = serial.Serial(
-		port = '/dev/ttyUSB0',
-		baudrate=19200)
 
 model = load_model.YOLOv4Tiny(weight_file='model/yolov4-tiny_fp32.rt')
 cap_object_detection = load_camera.csi_camera()
@@ -53,18 +49,14 @@ while(True):
 
 			if(detect):
 				ser_main.write(detect.encode("utf-8"))
-				ser_sub.write(detect.encode("utf-8"))
 				
 				print("QR scanner start")
 				while(True):
-					if(ser_sub.readable()):
-						sub_res = ser_sub.readline()
-						qr_data = sub_res.decode()[:len(sub_res)-1][:-1]
-						print(qr_data.encode())
+					qr_data = input()
+					print("qrcode : "+qr_data)
 
-						print("Firebase start")
-						firebase_rup.firebase_update(qr_data)
-						break
+					firebase_rup.firebase_update(qr_data)
+					break
 				print("QR scanner end")
 
 
