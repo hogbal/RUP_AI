@@ -35,7 +35,7 @@ while(True):
 		read_data = main_res.decode()[:len(main_res)-1]
 		if(read_data == 'Detection\r'):
 			print("Detection start")
-			detect = loop_detect.yolov4_tiny_log(model, cap_object_detection)
+			detect = loop_detect.yolov4_tiny_log(model, cap_object_detection, 10)
 			print("met : "+detect)
 
 			if(detect == "pet"):

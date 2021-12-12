@@ -11,7 +11,7 @@ def update_check(detections):
 	else:
 		return 'false'
 
-def yolov4_tiny_cv2(model, cap):
+def yolov4_tiny_cv2(model, cap, second, return_check):
 	color_dic = {
 			'pet':(255,0,0),
 			'pp':(0,255,0),
@@ -26,7 +26,7 @@ def yolov4_tiny_cv2(model, cap):
 		video_shower = VideoShow(img).start()
 		window_handle = cv2.namedWindow("CSI Camera", cv2.WINDOW_AUTOSIZE)
 
-		end = time.time() + 10
+		end = time.time() + second
 
 		while cap.isOpened() and time.time() < end:
 			ret_val, img = cap.read()
@@ -54,16 +54,16 @@ def yolov4_tiny_cv2(model, cap):
 			video_shower.frame = img
 			
 			result = update_check(detections)
-			if result:
+			if result and return_check:
 				return result 
 
 		cv2.destroyAllWindows()
-		return False
+		return 'false'
 	else:
 		print("Unable to open camera")
-		return False
+		return 'false'
 
-def yolov4_tiny_log(model, cap):
+def yolov4_tiny_log(model, cap, second):
 	color_dic = {
 			'pet':(255,0,0),
 			'pp':(0,255,0),
@@ -71,7 +71,7 @@ def yolov4_tiny_log(model, cap):
 	}
 
 	if cap.isOpened():
-		end = time.time() + 10
+		end = time.time() + second
 		while cap.isOpened() and time.time() < end:
 			ret_val, img = cap.read()
 			if not ret_val:
@@ -90,10 +90,10 @@ def yolov4_tiny_log(model, cap):
 			result = update_check(detections)
 			if result != 'false':
 				return result 
-		return False
+		return 'false'
 	else:
 		print("Unable to open camera")
-		return False
+		return 'false'
 
 class VideoShow:
 	def __init__(self, frame=None):
