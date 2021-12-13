@@ -1,7 +1,0 @@
-![image1](https://github.com/hogbal/RUP/blob/master/tensorflow/object_detection/workspace/training_rup/exported-models/images/ssd_mobilenet_v3/image1.png)
-![image2](https://github.com/hogbal/RUP/blob/master/tensorflow/object_detection/workspace/training_rup/exported-models/images/ssd_mobilenet_v3/image2.png)
-![image3](https://github.com/hogbal/RUP/blob/master/tensorflow/object_detection/workspace/training_rup/exported-models/images/ssd_mobilenet_v3/image3.png)
-![image4](https://github.com/hogbal/RUP/blob/master/tensorflow/object_detection/workspace/training_rup/exported-models/images/ssd_mobilenet_v3/image4.png)
-![image5](https://github.com/hogbal/RUP/blob/master/tensorflow/object_detection/workspace/training_rup/exported-models/images/ssd_mobilenet_v3/image5.png)
-![image6](https://github.com/hogbal/RUP/blob/master/tensorflow/object_detection/workspace/training_rup/exported-models/images/ssd_mobilenet_v3/image6.png)
-![image7](https://github.com/hogbal/RUP/blob/master/tensorflow/object_detection/workspace/training_rup/exported-models/images/ssd_mobilenet_v3/image7.png)
