@@ -1,20 +1,32 @@
-FROM nvcr.io/nvidia/tensorrt:21.11-py3
+FROM nvcr.io/nvidia/tensorrt:21.06-py3
 
 ARG DEBIAN_FRONTEND=noninteractive
-ENV LD_LIBRARY_PATH /usr/local/cuda-11.3/compat/:$LD_LIBRARY_PATH
 
 RUN apt-get update && \
 	apt-get upgrade -y && \
 	apt-get install build-essential -y && \
+	apt-get install pkg-config -y && \
+	apt-get install libjpeg-dev libtiff5-dev libpng-dev -y && \
+	apt-get install ffmpeg libavcodec-dev libavformat-dev libswscale-dev libxvidcore-dev libx264-dev libxine2-dev -y && \
+	apt-get install libv4l-dev v4l-utils -y && \
+	apt-get install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev -y && \
+	apt-get install libgtk-3-dev -y && \
+	apt-get install mesa-utils libgl1-mesa-dri libgtkgl2.0-dev libgtkglext1-dev -y && \
+	apt-get install libatlas-base-dev gfortran libeigen3-dev -y && \
+	apt-get install qt5-default -y && \
 	apt-get install python3-dev python3-numpy python3-pip -y && \
 	apt-get install tmux -y && \
+	apt-get install wget -y && \
 	apt-get install zsh -y && \
 	apt-get install git -y && \
 	apt-get install vim -y && \
-	apt-get install fonts-powerline -y && \
 	apt-get install -y language-pack-en && \
 	apt-get install libssl-dev -y && \
+	apt install libcanberra-gtk-module libcanberra-gtk3-module -y && \
+	apt install libssl-dev -y && \
 	apt install libyaml-cpp-dev curl libeigen3-dev -y && \
+	apt install fonts-powerline -y && \
+	apt install zip -y && \
 	update-locale
 
 #setting vim
@@ -37,10 +49,10 @@ RUN chsh -s /usr/bin/zsh && \
 #install cmake
 WORKDIR /root
 
-RUN wget https://cmake.org/files/v3.20/cmake-3.20.4.tar.gz
-RUN tar -xvzf cmake-3.20.4.tar.gz && rm cmake-3.20.4.tar.gz
+RUN wget https://cmake.org/files/v3.21/cmake-3.21.4.tar.gz
+RUN tar -xvzf cmake-3.21.4.tar.gz && rm cmake-3.21.4.tar.gz
 
-WORKDIR /root/cmake-3.20.4
+WORKDIR /root/cmake-3.21.4
 RUN ./bootstrap --prefix=/usr/local
 RUN make -j4
 RUN make install
@@ -92,6 +104,7 @@ RUN make -j4
 RUN make install
 
 #setting tkdnn
+WORKDIR /root
 RUN git clone https://github.com/ceccocats/tkDNN
 WORKDIR tkDNN
 RUN mkdir build
