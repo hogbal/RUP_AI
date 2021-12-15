@@ -106,6 +106,8 @@ RUN make install
 #setting tkdnn
 WORKDIR /root
 RUN git clone https://github.com/ceccocats/tkDNN
+COPY rup_yolov4-csp.cpp /root/tkDNN/tests/darknet
+
 WORKDIR tkDNN
 RUN mkdir build
 WORKDIR build
