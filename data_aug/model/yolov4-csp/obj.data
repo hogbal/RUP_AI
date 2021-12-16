@@ -1,0 +1,2 @@
+classes = 3
+names = model/yolov4-csp/obj.names

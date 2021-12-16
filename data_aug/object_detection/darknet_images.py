@@ -2,11 +2,11 @@ import argparse
 import os
 import glob
 import random
-import darknet
+import object_detection.darknet as darknet
 import time
 import cv2
 import numpy as np
-import darknet
+import copy
 
 
 def parser():
@@ -97,23 +97,23 @@ def prepare_batch(images, network, channels=3):
     return darknet.IMAGE(width, height, channels, darknet_images)
 
 
-def image_detection(image_path, network, class_names, class_colors, thresh):
+def image_detection(image, network, class_names, class_colors, thresh):
     # Darknet doesn't accept numpy images.
     # Create one with image we reuse for each detect
     width = darknet.network_width(network)
     height = darknet.network_height(network)
     darknet_image = darknet.make_image(width, height, 3)
 
-    image = cv2.imread(image_path)
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image_resized = cv2.resize(image_rgb, (width, height),
                                interpolation=cv2.INTER_LINEAR)
+    return_image_resized = copy.deepcopy(image_resized)
 
     darknet.copy_image_from_bytes(darknet_image, image_resized.tobytes())
     detections = darknet.detect_image(network, class_names, darknet_image, thresh=thresh)
     darknet.free_image(darknet_image)
     image = darknet.draw_boxes(detections, image_resized, class_colors)
-    return cv2.cvtColor(image, cv2.COLOR_BGR2RGB), detections
+    return cv2.cvtColor(return_image_resized, cv2.COLOR_BGR2RGB), cv2.cvtColor(image, cv2.COLOR_BGR2RGB), detections
 
 
 def batch_detection(network, images, class_names, class_colors,
@@ -215,7 +215,7 @@ def main():
             image_name = input("Enter Image Path: ")
         prev_time = time.time()
         image, detections = image_detection(
-            image_name, network, class_names, class_colors, args.thresh
+            image, network, class_names, class_colors, args.thresh
             )
         if args.save_labels:
             save_annotations(image_name, image, detections, class_names)
