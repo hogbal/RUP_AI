@@ -1,0 +1,16 @@
+<link rel="stylesheet" href="static/css/view.css">
+<h2>rup gallery</h2>
+<div class="grid-container">
+	{% for pic in pics %}
+		<article class="location-listing">
+			<a class="location-title" href="{{ url_for("static",filename="yolo/"+pic) }}">
+			</a>
+			<div class="location-image">
+				<a href="{{ url_for("static",filename="yolo/"+pic) }}">
+					<img src="{{ url_for("static", filename="yolo/"+pic) }}" />
+				</a>
+			</div>
+		</article>
+	{% endfor %}
+</div>
+
