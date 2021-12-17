@@ -1,7 +1,8 @@
 import cv2
 import os
+import zipfile
 from glob import glob
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, send_file
 from werkzeug.utils import secure_filename
 from object_detection import darknet, darknet_images
 
@@ -12,6 +13,8 @@ network, class_names, class_colors = darknet.load_network(
 	'model/yolov4-csp/yolov4-csp_best.weights',
 	batch_size=1
 )
+admin_email = 'rup@talk'
+admin_passwd = 'rup'
 
 
 @app.route('/upload', methods = ['GET', 'POST'])
@@ -45,20 +48,60 @@ def render_file():
 			vidcap.release()
 		else:
 			return 'upload error'
+		return redirect('https:/hogbal.co.kr:5000')
 
-		return  'detections success'
 
-@app.route('/view')
-def view():
-	filepaths = glob('static/yolo/dis*.png')
-	filename = []
-	for filepath in filepaths:
-		filename.append(os.path.basename(filepath))
-	return render_template("view.html", pics=filename)
+@app.route('/delete_dir', methods = ['GET', 'POST'])
+def delete_dir():
+	if request.method == 'GET':
+		return_addr = 'delete_dir'
+		return render_template('login.html', path=return_addr)
+	else:
+		email = request.form['email']
+		passwd = request.form['password']
+		if email != admin_email:
+			return 'email error'
+		elif passwd != admin_passwd:
+			return 'passwd error'
+		else:
+			filelist = glob('static/yolo/*')
+			for filename in filelist:
+				os.remove(filename)
+			return redirect('https:/hogbal.co.kr:5000')
+
+@app.route('/download', methods = ['GET', 'POST'])
+def download():
+	if request.method == 'GET':
+		return_addr = 'download'
+		return render_template('login.html', path=return_addr)
+	else:
+		email = request.form['email']
+		passwd = request.form['password']
+		if email != admin_email:
+			return 'email error'
+		elif passwd != admin_passwd:
+			return 'passwd error'
+		else:
+			download_zip = zipfile.ZipFile('temp/download.zip','w')
+
+			filelist = glob('static/yolo/frame*')
+			for filename in filelist:
+				download_zip.write(filename)
+
+			return send_file('temp/download.zip',
+					mimetype='application/zip',
+					attachment_filename='download.zip',
+					as_attachment=True
+					)
+
 
 @app.route('/')
 def home():
-	return 'rup web server!'
+	filepaths = glob('static/yolo/dis*.png')
+	filenames = []
+	for i in range(len(filepaths)):
+		filenames.append([os.path.basename(filepaths[i]),i+1])
+	return render_template("index.html", filenames=filenames, filelen=len(filenames))
 
 if __name__ == '__main__':
 	app.run(host='0.0.0.0',debug=True)

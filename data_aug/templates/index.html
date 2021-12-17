@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>RUP image gallery</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="{{ url_for('static',filename='lens/assets/css/main.css') }}" />
+		<noscript>
+			<link rel="stylesheet" href="{{ url_for('static',filename='lens/assets/css/noscript.css') }}" />
+		</noscript>
+	</head>
+	<body class="is-loading-0 is-loading-1 is-loading-2">
+		<!-- Main -->
+			<div id="main">
+				<!-- Header -->
+					<header id="header">
+						<h1>RUP</h1>
+						<p>RUP Deep Learning Image Gallery</p>
+						<input type="button" value="detection" onclick="detection();" />
+						<input type="button" value="delete" onclick="delete_dir();" />
+						<input type="button" value="download" onclick="download();" />
+						<ul class="icons">
+							<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="#" class="icon fa-instagram"><span class="label">Instagram</span></a></li>
+							<li><a href="#" class="icon fa-github"><span class="label">Github</span></a></li>
+							<li><a href="#" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+						</ul>
+					</header>
+
+				<!-- Thumbnail -->
+					<section id="thumbnails">
+						{% for filename in filenames %}
+						<article loading="lazy">
+							<a class="thumbnail" href="{{ url_for('static',filename='yolo/'+filename[0]) }}">
+								<img src="{{ url_for('static',filename='yolo/'+filename[0]) }}" alt=""/>
+							</a>
+							<h2>{{ filename[0] }}</h2>
+							<p>{{ filename[1] }}/{{ filelen }}</p>
+						</article>
+						{% endfor %}
+					</section>
+				<!-- Footer -->
+					<footer id="footer">
+						<ul class="copyright">
+							<li>&copy; Untitled.</li><li>Design: <a href="http://designscrazed.org/">HTML5</a>.</li>
+						</ul>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="{{ url_for('static',filename='lens/assets/js/jquery.min.js') }}"></script>
+			<script src="{{ url_for('static',filename='lens/assets/js/skel.min.js') }}"></script>
+			<script src="{{ url_for('static',filename='lens/assets/js/main.js') }}"></script>
+			<script>
+				function detection(){
+					window.open("upload","a","width=400, height=300, left=100, top=50"); 
+				}
+				function delete_dir(){
+					window.open("delete_dir","a","width=400, height=300, left=100, top=50"); 
+				}
+				function download(){
+					window.open("download","a","width=400, height=300, left=100, top=50"); 
+				}
+			</script>
+
+	</body>
+</html>
