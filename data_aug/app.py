@@ -1,6 +1,7 @@
 import cv2
 import os
 import zipfile
+import natsort
 from glob import glob
 from flask import Flask, render_template, request, redirect, send_file
 from werkzeug.utils import secure_filename
@@ -48,7 +49,7 @@ def render_file():
 			vidcap.release()
 		else:
 			return 'upload error'
-		return redirect('https:/hogbal.co.kr:5000')
+		return redirect('https://hogbal.co.kr:5000')
 
 
 @app.route('/delete_dir', methods = ['GET', 'POST'])
@@ -67,7 +68,7 @@ def delete_dir():
 			filelist = glob('static/yolo/*')
 			for filename in filelist:
 				os.remove(filename)
-			return redirect('https:/hogbal.co.kr:5000')
+			return redirect('https://hogbal.co.kr:5000')
 
 @app.route('/download', methods = ['GET', 'POST'])
 def download():
@@ -101,6 +102,7 @@ def home():
 	filenames = []
 	for i in range(len(filepaths)):
 		filenames.append([os.path.basename(filepaths[i]),i+1])
+	filenames = nasort.natsorted(filenames)
 	return render_template("index.html", filenames=filenames, filelen=len(filenames))
 
 if __name__ == '__main__':

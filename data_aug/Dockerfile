@@ -30,7 +30,8 @@ RUN apt-get update && \
 
 RUN pip3 install opencv-python && \
 	pip3 install requests && \
-	pip3 install flask
+	pip3 install flask && \
+	pip3 install natsort
 
 #install cmake
 WORKDIR /root
