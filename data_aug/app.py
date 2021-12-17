@@ -99,10 +99,10 @@ def download():
 @app.route('/')
 def home():
 	filepaths = glob('static/yolo/dis*.png')
+	filepaths = natsort.natsorted(filepaths)
 	filenames = []
 	for i in range(len(filepaths)):
 		filenames.append([os.path.basename(filepaths[i]),i+1])
-	filenames = nasort.natsorted(filenames)
 	return render_template("index.html", filenames=filenames, filelen=len(filenames))
 
 if __name__ == '__main__':

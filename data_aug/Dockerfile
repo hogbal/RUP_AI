@@ -90,24 +90,5 @@ RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
 RUN make -j4
 RUN make install
 
-#setting vim
-COPY vimrc /root/.vimrc
-
-#setting tmux
-WORKDIR /root
-RUN git clone https://github.com/gpakosz/.tmux.git
-RUN ln -s -f .tmux/.tmux.conf
-RUN cp .tmux/.tmux.conf.local .
-
-#install oh my zsh
-RUN chsh -s /usr/bin/zsh && \
-	sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" && \
-	sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="agnoster"/' ~/.zshrc && \
-	git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting && \
-	git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions && \
-	sed -i 's/plugins=(git)/plugins=(git zsh-syntax-highlighting zsh-autosuggestions)/' ~/.zshrc
-
-#setting gui
-ENV NO_AT_BRIDGE=1
-
 WORKDIR /server
+CMD ["python3","app.py"]
