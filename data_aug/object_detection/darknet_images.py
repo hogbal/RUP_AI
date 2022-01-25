@@ -167,7 +167,8 @@ def save_annotations(name, image, detections, class_names):
         for label, confidence, bbox in detections:
             x, y, w, h = convert2relative(image, bbox)
             label = class_names.index(label)
-            f.write("{} {:.4f} {:.4f} {:.4f} {:.4f} {:.4f}\n".format(label, x, y, w, h, float(confidence)))
+            #f.write("{} {:.4f} {:.4f} {:.4f} {:.4f} {:.4f}\n".format(label, x, y, w, h, float(confidence)))
+            f.write("{} {:.4f} {:.4f} {:.4f} {:.4f}\n".format(label, x, y, w, h))
 
 
 def batch_detection_example():
