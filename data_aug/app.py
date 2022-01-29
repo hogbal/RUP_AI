@@ -25,17 +25,24 @@ def render_file():
 	else:
 		f = request.files['file']
 		filename = secure_filename(f.filename)
+
+		met = request.form['met']
 		if filename:
 			f.save('temp/'+filename)
 			vidcap = cv2.VideoCapture('temp/'+filename)
 			
 			count = 0
+			frame_count = 10
 			while vidcap.isOpened():
 				success, frame = vidcap.read()
-				if success:
+				if(frame_count != 10):
+					frame_count += 1
+				elif success:
+					frame_count = 1
 					image_resized, image_draw, detections = darknet_images.image_detection(
-							frame, network, class_names, class_colors,.25
+							frame, network, class_names, class_colors,.25, met
 					)
+
 					yolo_path = 'static/yolo/'
 					img_name = 'original/frame'+str(count)+'.png'
 					dis_img_name = 'detection/dis'+str(count)+'.png'
@@ -44,9 +51,9 @@ def render_file():
 					cv2.imwrite(yolo_path+dis_img_name, image_draw)
 					cv2.imwrite(yolo_path+img_name, image_resized)
 					darknet_images.save_annotations(yolo_path+label_name, image_draw, detections, class_names)
+					count += 1
 				else:
 					break
-				count += 1
 			os.remove('temp/'+filename)
 			vidcap.release()
 		else:

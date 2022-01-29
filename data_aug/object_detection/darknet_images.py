@@ -97,7 +97,7 @@ def prepare_batch(images, network, channels=3):
     return darknet.IMAGE(width, height, channels, darknet_images)
 
 
-def image_detection(image, network, class_names, class_colors, thresh):
+def image_detection(image, network, class_names, class_colors, thresh, met):
     # Darknet doesn't accept numpy images.
     # Create one with image we reuse for each detect
     width = darknet.network_width(network)
@@ -111,9 +111,15 @@ def image_detection(image, network, class_names, class_colors, thresh):
 
     darknet.copy_image_from_bytes(darknet_image, image_resized.tobytes())
     detections = darknet.detect_image(network, class_names, darknet_image, thresh=thresh)
+
+    new_detections = []
+    for detection in detections:
+        if(detection[0] == met):
+            new_detections.append(detection)
+
     darknet.free_image(darknet_image)
-    image = darknet.draw_boxes(detections, image_resized, class_colors)
-    return cv2.cvtColor(return_image_resized, cv2.COLOR_BGR2RGB), cv2.cvtColor(image, cv2.COLOR_BGR2RGB), detections
+    image = darknet.draw_boxes(new_detections, image_resized, class_colors)
+    return cv2.cvtColor(return_image_resized, cv2.COLOR_BGR2RGB), cv2.cvtColor(image, cv2.COLOR_BGR2RGB), new_detections
 
 
 def batch_detection(network, images, class_names, class_colors,
