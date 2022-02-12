@@ -2,6 +2,7 @@ import cv2
 import os
 import zipfile
 import natsort
+import re
 from glob import glob
 from flask import Flask, render_template, request, redirect, send_file
 from werkzeug.utils import secure_filename
@@ -17,7 +18,6 @@ network, class_names, class_colors = darknet.load_network(
 admin_email = 'rup@talk'
 admin_passwd = 'rup'
 
-
 @app.route('/upload', methods = ['GET', 'POST'])
 def render_file():
 	if request.method == 'GET':	
@@ -25,31 +25,40 @@ def render_file():
 	else:
 		f = request.files['file']
 		filename = secure_filename(f.filename)
+
+		met = request.form['met']
 		if filename:
 			f.save('temp/'+filename)
 			vidcap = cv2.VideoCapture('temp/'+filename)
 			
 			count = 0
+			frame_count = 10
 			while vidcap.isOpened():
 				success, frame = vidcap.read()
-				if success:
+				if(frame_count != 10):
+					frame_count += 1
+				elif success:
+					frame_count = 1
 					image_resized, image_draw, detections = darknet_images.image_detection(
-							frame, network, class_names, class_colors,.25
+							frame, network, class_names, class_colors,.25, met
 					)
+
 					yolo_path = 'static/yolo/'
-					img_name = 'frame'+str(count)+'.png'
-					dis_img_name = 'dis'+str(count)+'.png'
+					img_name = 'original/frame'+str(count)+'.png'
+					dis_img_name = 'detection/dis'+str(count)+'.png'
+					label_name = 'yolo_txt/frame'+str(count)+'.png'
+
 					cv2.imwrite(yolo_path+dis_img_name, image_draw)
 					cv2.imwrite(yolo_path+img_name, image_resized)
-					darknet_images.save_annotations(yolo_path+img_name, image_draw, detections, class_names)
+					darknet_images.save_annotations(yolo_path+label_name, image_draw, detections, class_names)
+					count += 1
 				else:
 					break
-				count += 1
 			os.remove('temp/'+filename)
 			vidcap.release()
 		else:
 			return 'upload error'
-		return redirect('https://hogbal.co.kr:5000')
+		return redirect('http://hogbal.co.kr:5000')
 
 
 @app.route('/delete_dir', methods = ['GET', 'POST'])
@@ -65,10 +74,13 @@ def delete_dir():
 		elif passwd != admin_passwd:
 			return 'passwd error'
 		else:
-			filelist = glob('static/yolo/*')
+			filelist = glob('static/yolo/original/frame*.txt')
+			filelist += glob('static/yolo/yolo_txt/frame*.txt')
+			filelist += glob('static/yolo/detection/dis*.png')
+
 			for filename in filelist:
 				os.remove(filename)
-			return redirect('https://hogbal.co.kr:5000')
+			return redirect('http://hogbal.co.kr:5000')
 
 @app.route('/download', methods = ['GET', 'POST'])
 def download():
@@ -85,9 +97,12 @@ def download():
 		else:
 			download_zip = zipfile.ZipFile('temp/download.zip','w')
 
-			filelist = glob('static/yolo/frame*')
+			filelist = glob('static/yolo/original/*.png')
+			filelist += glob('static/yolo/yolo_txt/*.txt')
 			for filename in filelist:
 				download_zip.write(filename)
+
+			download_zip.close()
 
 			return send_file('temp/download.zip',
 					mimetype='application/zip',
@@ -98,7 +113,7 @@ def download():
 
 @app.route('/')
 def home():
-	filepaths = glob('static/yolo/dis*.png')
+	filepaths = glob('static/yolo/detection/dis*.png')
 	filepaths = natsort.natsorted(filepaths)
 	filenames = []
 	for i in range(len(filepaths)):

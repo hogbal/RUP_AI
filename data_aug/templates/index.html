@@ -14,11 +14,14 @@
 			<div id="main">
 				<!-- Header -->
 					<header id="header">
-						<h1>RUP</h1>
+						<img src="static/rup.png" alt="rup"/>
 						<p>RUP Deep Learning Image Gallery</p>
-						<input type="button" value="detection" onclick="detection();" />
-						<input type="button" value="delete" onclick="delete_dir();" />
-						<input type="button" value="download" onclick="download();" />
+						<div style="width: 100%; float: right; font-size:smaller;">
+							<input type="button" value="Detection" onclick="detection();" />
+							<input type="button" value="파일삭제" onclick="delete_dir();" />
+							<input type="button" value="파일다운" onclick="download();" />
+						</div>
+						<div style="clear:both:"></div>
 						<ul class="icons">
 							<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
 							<li><a href="#" class="icon fa-instagram"><span class="label">Instagram</span></a></li>
@@ -30,9 +33,9 @@
 				<!-- Thumbnail -->
 					<section id="thumbnails">
 						{% for filename in filenames %}
-						<article loading="lazy">
-							<a class="thumbnail" href="{{ url_for('static',filename='yolo/'+filename[0]) }}">
-								<img src="{{ url_for('static',filename='yolo/'+filename[0]) }}" alt=""/>
+						<article>
+							<a class="thumbnail" href="{{ url_for('static',filename='yolo/detection/'+filename[0]) }}">
+								<img src="{{ url_for('static',filename='yolo/detection/'+filename[0]) }}" alt="" loading="lazy"/>
 							</a>
 							<h2>{{ filename[0] }}</h2>
 							<p>{{ filename[1] }}/{{ filelen }}</p>
