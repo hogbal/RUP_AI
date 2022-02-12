@@ -1,108 +1,242 @@
-#include <ArduinoJson.h>
-#include <usbhid.h>
-#include <usbhub.h>
-#include <hiduniversal.h>
-#include <hidboot.h>
-#include <SPI.h>
 #include <Wire.h>
+#include <Servo.h>
 #include <Adafruit_PWMServoDriver.h>
 
 Adafruit_PWMServoDriver pwm=Adafruit_PWMServoDriver();
-#define SERVOMIN  150 // This is the 'minimum' pulse length count (out of 4096)
-#define SERVOMAX  600 // This is the 'maximum' pulse length count (out of 4096)
+#define SERVOMIN  70 // This is the 'minimum' pulse length count (out of 4096)
+#define SERVOMAX  510 // This is the 'maximum' pulse length count (out of 4096)
+#define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
+#define TRIG 10
+#define ECHO 11
 
+Servo servo;
+const int servo0 = 9;
+const int servo1 = 1;
+const int servo2 = 2;
+const int servo3 = 3;
+const int servo4 = 4;
 
-#define TRIG 9
-#define ECHO 8
-#define LED 7
+int servo_angle1 = 35;
+int servo_angle2 = 40;
 
-void throw_away_rup(){
-/*
-  for (uint16_t pulselen = SERVOMIN; pulselen < 500; pulselen++) {
-    pwm.setPWM(5, 0, pulselen);
+int em_d=700, pet_d=1200, pp_d=1500,ps_d=2300;
+
+void setARM(int num,int angle){
+  int value = map(angle,0,180,SERVOMIN,SERVOMAX);
+  pwm.setPWM(num,0,value);
+}
+
+void open_func(){
+  setARM(servo4,0);
+}
+
+void close_func(){
+  setARM(servo4,50);
+}
+
+void center(){
+  int angle1 = 35;
+  int angle2 = 40;
+  for(;servo_angle1 >= angle1 || servo_angle2 >= angle2;servo_angle1--,servo_angle2--){
+    if(servo_angle1 >= angle1){
+      setARM(servo1,servo_angle1);
+    }
+    if(servo_angle2 >= angle2){
+      setARM(servo2,servo_angle2);
+    }
+    delay(15);
+  }
+  
+  setARM(servo3,30);
+  delay(2000);
+  open_func();
+}
+
+void empty(){
+  /*
+  servo.write(110);
+  delay(em_d);
+
+  servo.write(90);
+  delay(100);
+  */
+
+  for(int i=30;i<140;i++){
+    setARM(servo3,i);
+    delay(10);
+  }
+  delay(2000);
+
+  for(int i=140;i>30;i--){
+    setARM(servo3,i);
+    delay(10);
   }
   delay(1000);
-*/
-  for (uint16_t pulselen = 500; pulselen < SERVOMIN; pulselen--) {
-    pwm.setPWM(5, 0, pulselen);
-  }
-  delay(1000);
+  /*
+  servo.write(75);
+  delay(em_d);
+  
+  servo.write(90);
+  */
+}
 
-  for (uint16_t pulselen = SERVOMAX; pulselen > SERVOMIN; pulselen--) {
-    pwm.setPWM(4, 0, pulselen);
+void pet(){
+  servo.write(113);
+  delay(pet_d);
+
+  servo.write(90);
+  delay(500);
+
+  int angle1 = 60;
+  int angle2 = 65;
+  for(;servo_angle1 <= angle1 || servo_angle2 <= angle2;servo_angle1++,servo_angle2++){
+    if(servo_angle1 <= angle1){
+      setARM(servo1,servo_angle1);
+    }
+    if(servo_angle2 <= angle2){
+      setARM(servo2,servo_angle2);
+    }
+    delay(15);
   }
   delay(1000);
-  for (uint16_t pulselen = SERVOMIN; pulselen < SERVOMAX; pulselen++) {
-    pwm.setPWM(4, 0, pulselen);
-  }
+  
+  open_func();
+  delay(1000);
+  
+  servo.write(74);
+  delay(pet_d);
+  servo.write(90);
+  
   delay(1000);
 }
 
-void setup(){
-  Serial.begin(9600);
+void pp(){
+  servo.write(75.5);
+  delay(pp_d);
+  
+  servo.write(90);
+  delay(500);
 
-  pinMode(TRIG,OUTPUT);
-  pinMode(ECHO,INPUT);
+  int angle1 = 60;
+  int angle2 = 65;
+  for(;servo_angle1 <= angle1 || servo_angle2 <= angle2;servo_angle1++,servo_angle2++){
+    if(servo_angle1 <= angle1){
+      setARM(servo1,servo_angle1);
+    }
+    if(servo_angle2 <= angle2){
+      setARM(servo2,servo_angle2);
+    }
+    delay(15);
+  }
+  delay(1000);
+  
+  open_func();
+  delay(1000);
+  
+  servo.write(108);
+  delay(pp_d);
+  servo.write(90);
+  delay(1000);
+}
+
+void ps(){  
+  servo.write(107.5);
+  delay(ps_d);
+  
+  servo.write(90);
+  delay(500);
+
+  int angle1 = 35;
+  int angle2 = 40;
+  for(;servo_angle1 >= angle1 || servo_angle2 >= angle2;servo_angle1--,servo_angle2--){
+    if(servo_angle1 >= angle1){
+      setARM(servo1,servo_angle1);
+    }
+    if(servo_angle2 >= angle2){
+      setARM(servo2,servo_angle2);
+    }
+    delay(15);
+  }
+  
+  delay(1000);
+  
+  open_func();
+  delay(1000);
+
+  servo.write(80);
+  delay(ps_d);
+  
+  servo.write(90);
+  delay(1000);
+}
+
+
+void setup() {
+  Serial.begin(9600);
+  servo.attach(servo0);
+  servo.write(90);
+
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
 
   pwm.begin();
-  pwm.setPWMFreq(51);
+  pwm.setOscillatorFrequency(27000000);
+  pwm.setPWMFreq(SERVO_FREQ);  // Analog servos run at ~50 Hz updates
 
-  pwm.setPWM(4,0,540);
-  pwm.setPWM(3,0,250);
-  pwm.setPWM(2,0,150);
-  pwm.setPWM(1,0,350);
-  pwm.setPWM(0,0,150);
+  center();
+  Serial.println("setting success");
 
-  pinMode(LED, OUTPUT);
-  digitalWrite(LED, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(1000);                       // wait for a second
-  digitalWrite(LED, LOW);    // turn the LED off by making the voltage LOW
-  delay(1000);                       // wait for a second
+  delay(10);
 }
 
 void loop() {
   digitalWrite(TRIG,LOW);
   digitalWrite(ECHO,LOW);
   delayMicroseconds(2);
-  digitalWrite(TRIG,HIGH);delayMicroseconds(10);
+  digitalWrite(TRIG,HIGH);
+  delayMicroseconds(10);
   digitalWrite(TRIG,LOW);
 
   unsigned long duration = pulseIn(ECHO,HIGH);
   float distance = ((float)(340*duration)/10000)/2;
-  
-  if(distance >= 10 && distance <= 30){
-    //throw_away_rup();
+
+  if(distance <= 10){
+    delay(500);
+    close_func();
+    delay(500);
+    
+    empty();
     Serial.println("Detection");
 
-    while(true){
+    while(true) {
       if(Serial.available()){
         char data = Serial.read();
         if(data == '1') {
-          digitalWrite(LED, HIGH);   // turn the LED on (HIGH is the voltage level)
-          delay(1000);                       // wait for a second
-          digitalWrite(LED, LOW);    // turn the LED off by making the voltage LOW
-          delay(1000);
-          break;                    // wait for a second
+          pet();
+          break;
         }
         else if(data == '2'){
-          digitalWrite(LED, HIGH);   // turn the LED on (HIGH is the voltage level)
-          delay(2000);                       // wait for a second
-          digitalWrite(LED, LOW);    // turn the LED off by making the voltage LOW
-          delay(2000);                       // wait for a second
+          pp();
           break;
-          
         }
         else if(data == '3'){
-          digitalWrite(LED, HIGH);   // turn the LED on (HIGH is the voltage level)
-          delay(3000);                       // wait for a second
-          digitalWrite(LED, LOW);    // turn the LED off by making the voltage LOW
-          delay(3000);                       // wait for a second
+          ps();
+          break;
+        }
+        else if(data == '0'){
+          //detect error
           break;
         }
       }
     }
-  }
-  else {
-    //Serial.println("0");
+    center();
+    while(true) {
+      if(Serial.available()){
+        char data = Serial.read();
+        if(data == 'e') {
+          break;
+        }
+      }
+    }
   }
 }

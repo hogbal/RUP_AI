@@ -45,11 +45,11 @@ while(True):
 			elif(detect == "ps"):
 				detect = '3'
 			else:
-				detect = 0
+				detect = '0'
 
-			if(detect):
-				ser_main.write(detect.encode("utf-8"))
-				
+			ser_main.write(detect.encode("utf-8"))
+
+			if(detect != '0'):
 				print("QR scanner start")
 				while(True):
 					qr_data = input()
@@ -58,6 +58,11 @@ while(True):
 					firebase_rup.firebase_update(qr_data)
 					break
 				print("QR scanner end")
+
+			time.sleep(1)
+			end_signal = 'e'
+			ser_main.write(end_signal.encode("utf-8"))
+			print("end process")
 
 
 
