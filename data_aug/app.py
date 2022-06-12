@@ -58,7 +58,7 @@ def render_file():
 			vidcap.release()
 		else:
 			return 'upload error'
-		return redirect('http://hogbal.co.kr:5000')
+		return redirect('http://hogbal.iptime.org:5000')
 
 
 @app.route('/delete_dir', methods = ['GET', 'POST'])
@@ -80,7 +80,7 @@ def delete_dir():
 
 			for filename in filelist:
 				os.remove(filename)
-			return redirect('http://hogbal.co.kr:5000')
+			return redirect('http://hogbal.iptime.org:5000')
 
 @app.route('/download', methods = ['GET', 'POST'])
 def download():
