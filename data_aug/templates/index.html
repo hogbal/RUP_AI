@@ -8,6 +8,11 @@
 		<noscript>
 			<link rel="stylesheet" href="{{ url_for('static',filename='lens/assets/css/noscript.css') }}" />
 		</noscript>
+		<style>
+			canvas{
+				background:transparent;
+			  }
+		</style>
 	</head>
 	<body class="is-loading-0 is-loading-1 is-loading-2">
 		<!-- Main -->
@@ -48,7 +53,6 @@
 							<li>&copy; Untitled.</li><li>Design: <a href="http://designscrazed.org/">HTML5</a>.</li>
 						</ul>
 					</footer>
-
 			</div>
 
 		<!-- Scripts -->
@@ -66,6 +70,37 @@
 					window.open("download","a","width=400, height=300, left=100, top=50"); 
 				}
 			</script>
-
+			<script>
+				$(document).ready(function(){
+					var canvas = document.getElementById("canvas");
+				  var ctx = canvas.getContext('2d');
+				  ctx.lineWidth = 3;
+				  ctx.strokeStyle = "#ff0000";
+				  
+				  var sX,sY,cX,cY;
+				  var canvasX = $(canvas).offset().left;
+				  var canvasY = $(canvas).offset().top;
+				  var draw = false;
+				  
+				  // click 시 draw 시작
+				  $("canvas").mousedown(function(e){
+					sX=parseInt(e.clientX-canvasX);
+					sY=parseInt(e.clientY-canvasY);
+					draw = true;
+				  })
+				  $("canvas").mousemove(function(e){
+					if(draw){
+					  cX=parseInt(e.clientX-canvasX);
+					  cY=parseInt(e.clientY-canvasY);
+					  ctx.clearRect(0,0,canvas.width,canvas.height); //clear canvas
+					  ctx.strokeRect(sX,sY,cX-sX,cY-sY);
+					}
+				  })
+				  // 마우스 놓으면 rectangle 완성 및 popup 생성
+				  $("canvas").mouseup(function(e){
+					draw = false;
+				  })
+				})
+			</script>
 	</body>
 </html>

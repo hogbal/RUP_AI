@@ -9,12 +9,20 @@ from werkzeug.utils import secure_filename
 from object_detection import darknet, darknet_images
 
 app = Flask(__name__)
+# network, class_names, class_colors = darknet.load_network(
+# 	'model/yolov4-csp/yolov4-csp.cfg',
+# 	'model/yolov4-csp/obj.data',
+# 	'model/yolov4-csp/yolov4-csp_best.weights',
+# 	batch_size=1
+# )
+
 network, class_names, class_colors = darknet.load_network(
-	'model/yolov4-csp/yolov4-csp.cfg',
-	'model/yolov4-csp/obj.data',
-	'model/yolov4-csp/yolov4-csp_best.weights',
+	'model/yolov4-tiny/yolov4-tiny.cfg',
+	'model/yolov4-tiny/obj.data',
+	'model/yolov4-tiny/yolov4-tiny_best.weights',
 	batch_size=1
 )
+
 admin_email = 'rup@talk'
 admin_passwd = 'rup'
 
