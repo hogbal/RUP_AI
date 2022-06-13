@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             }).start();
 
         });
-        this.sourceBitmap = Utils.getBitmapFromAsset(MainActivity.this, "kite.jpg");
+        this.sourceBitmap = Utils.getBitmapFromAsset(MainActivity.this, "pet1.jpg");
 
         this.cropBitmap = Utils.processBitmap(sourceBitmap, TF_OD_API_INPUT_SIZE);
 
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Minimum detection confidence to track a detection.
     private static final boolean MAINTAIN_ASPECT = false;
-    private Integer sensorOrientation = 3;
+    private Integer sensorOrientation = 90;
 
     private Classifier detector;
 

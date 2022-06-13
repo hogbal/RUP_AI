@@ -175,13 +175,14 @@ public class YoloV4Classifier implements Classifier {
     // Number of threads in the java app
     private static final int NUM_THREADS = 4;
     private static boolean isNNAPI = false;
-    private static boolean isGPU = true;
+    private static boolean isGPU = false;
 
     // tiny or not
     private static boolean isTiny = true;
 
     // config yolov4 tiny
-    private static final int[] OUTPUT_WIDTH_TINY = new int[]{2535, 2535};
+//    private static final int[] OUTPUT_WIDTH_TINY = new int[]{2535, 2535};
+    private static final int[] OUTPUT_WIDTH_TINY = new int[]{6000, 6000};
     private static final int[] OUTPUT_WIDTH_FULL = new int[]{10647, 10647};
     private static final int[][] MASKS_TINY = new int[][]{{3, 4, 5}, {1, 2, 3}};
     private static final int[] ANCHORS_TINY = new int[]{
