@@ -61,13 +61,13 @@
 			<script src="{{ url_for('static',filename='lens/assets/js/main.js') }}"></script>
 			<script>
 				function detection(){
-					window.open("upload","a","width=400, height=300, left=100, top=50"); 
+					window.open("upload","_self","width=400, height=300, left=100, top=50").close(); 
 				}
 				function delete_dir(){
-					window.open("delete_dir","a","width=400, height=300, left=100, top=50"); 
+					window.open("delete_dir","_self","width=400, height=300, left=100, top=50").close();
 				}
 				function download(){
-					window.open("download","a","width=400, height=300, left=100, top=50"); 
+					window.open("download","_self","width=400, height=300, left=100, top=50"); 
 				}
 			</script>
 			<script>

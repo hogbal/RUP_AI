@@ -1,11 +1,13 @@
-import cv2
 import os
-import zipfile
-import natsort
 import re
+import zipfile
 from glob import glob
-from flask import Flask, render_template, request, redirect, send_file
+
+import cv2
+import natsort
+from flask import Flask, redirect, render_template, request, send_file
 from werkzeug.utils import secure_filename
+
 from object_detection import darknet, darknet_images
 
 app = Flask(__name__)
@@ -66,7 +68,7 @@ def render_file():
 			vidcap.release()
 		else:
 			return 'upload error'
-		return redirect('http://hogbal.iptime.org:5000')
+		return redirect('/')
 
 
 @app.route('/delete_dir', methods = ['GET', 'POST'])
@@ -88,35 +90,28 @@ def delete_dir():
 
 			for filename in filelist:
 				os.remove(filename)
-			return redirect('http://hogbal.iptime.org:5000')
+			return redirect('/')
 
-@app.route('/download', methods = ['GET', 'POST'])
+@app.route('/download')
 def download():
-	if request.method == 'GET':
-		return_addr = 'download'
-		return render_template('login.html', path=return_addr)
-	else:
-		email = request.form['email']
-		passwd = request.form['password']
-		if email != admin_email:
-			return 'email error'
-		elif passwd != admin_passwd:
-			return 'passwd error'
-		else:
-			download_zip = zipfile.ZipFile('temp/download.zip','w')
-
-			filelist = glob('static/yolo/original/*.png')
-			filelist += glob('static/yolo/yolo_txt/*.txt')
-			for filename in filelist:
-				download_zip.write(filename)
-
-			download_zip.close()
-
-			return send_file('temp/download.zip',
-					mimetype='application/zip',
-					attachment_filename='download.zip',
-					as_attachment=True
-					)
+    download_zip = zipfile.ZipFile('temp/download.zip','w')
+    
+    filelist_img = glob('static/yolo/original/*.png')
+    filelist_txt = glob('static/yolo/yolo_txt/*.txt')
+    
+    for filename in filelist_img:
+        download_zip.write(filename,'img/'+os.path.basename(filename))
+    
+    for filename in filelist_txt:
+        download_zip.write(filename,'txt/'+os.path.basename(filename))
+    
+    download_zip.close()
+    
+    return send_file('temp/download.zip',
+			mimetype='application/zip',
+			attachment_filename='download.zip',
+			as_attachment=True
+			)
 
 
 @app.route('/')
