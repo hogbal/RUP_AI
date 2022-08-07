@@ -41,7 +41,8 @@ def render_file():
 			f.save('temp/'+filename)
 			vidcap = cv2.VideoCapture('temp/'+filename)
 			
-			count = 0
+			num = request.form['num']
+			count = int(num)
 			frame_count = 10
 			while vidcap.isOpened():
 				success, frame = vidcap.read()
@@ -54,9 +55,9 @@ def render_file():
 					)
 
 					yolo_path = 'static/yolo/'
-					img_name = 'original/frame'+str(count)+'.png'
+					img_name = 'original/'+met+str(count)+'.png'
 					dis_img_name = 'detection/dis'+str(count)+'.png'
-					label_name = 'yolo_txt/frame'+str(count)+'.png'
+					label_name = 'yolo_txt/'+met+str(count)+'.png'
 
 					cv2.imwrite(yolo_path+dis_img_name, image_draw)
 					cv2.imwrite(yolo_path+img_name, image_resized)
@@ -84,9 +85,9 @@ def delete_dir():
 		elif passwd != admin_passwd:
 			return 'passwd error'
 		else:
-			filelist = glob('static/yolo/original/frame*.txt')
-			filelist += glob('static/yolo/yolo_txt/frame*.txt')
-			filelist += glob('static/yolo/detection/dis*.png')
+			filelist = glob('static/yolo/original/*.png')
+			filelist += glob('static/yolo/yolo_txt/p*.txt')
+			filelist += glob('static/yolo/detection/*.png')
 
 			for filename in filelist:
 				os.remove(filename)
