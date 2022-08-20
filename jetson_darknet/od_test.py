@@ -12,6 +12,7 @@ config_file = 'model/yolov7-tiny/yolov7-tiny.cfg'
 data_file = 'model/yolov7-tiny/obj.data'
 weights = 'model/yolov7-tiny/yolov7-tiny_best.weights'
 '''
+
 config_file = 'model/yolov4-tiny/yolov4-tiny.cfg'
 data_file = 'model/yolov4-tiny/obj.data'
 weights = 'model/yolov4-tiny/yolov4-tiny_best.weights'
