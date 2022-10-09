@@ -9,172 +9,39 @@ Adafruit_PWMServoDriver pwm=Adafruit_PWMServoDriver();
 #define TRIG 10
 #define ECHO 11
 
-Servo servo;
-const int servo0 = 9;
-const int servo1 = 1;
-const int servo2 = 2;
-const int servo3 = 3;
-const int servo4 = 4;
-
-int servo_angle1 = 35;
-int servo_angle2 = 40;
-
-int em_d=700, pet_d=1200, pp_d=1500,ps_d=2300;
+const int pet = 1;
+const int pp = 2;
+const int ps = 3;
 
 void setARM(int num,int angle){
   int value = map(angle,0,180,SERVOMIN,SERVOMAX);
   pwm.setPWM(num,0,value);
 }
 
-void open_func(){
-  setARM(servo4,0);
+void servo_init(){
+  setARM(pet, 0);
+  setARM(pp, 0);
+  setARM(ps, 0);
 }
 
-void close_func(){
-  setARM(servo4,50);
-}
-
-void center(){
-  int angle1 = 35;
-  int angle2 = 40;
-  for(;servo_angle1 >= angle1 || servo_angle2 >= angle2;servo_angle1--,servo_angle2--){
-    if(servo_angle1 >= angle1){
-      setARM(servo1,servo_angle1);
-    }
-    if(servo_angle2 >= angle2){
-      setARM(servo2,servo_angle2);
-    }
-    delay(15);
-  }
-  
-  setARM(servo3,30);
-  delay(2000);
-  open_func();
-}
-
-void empty(){
-  /*
-  servo.write(110);
-  delay(em_d);
-
-  servo.write(90);
-  delay(100);
-  */
-
-  for(int i=30;i<140;i++){
-    setARM(servo3,i);
+void open_met(int servo){
+  setARM(servo, 0);
+  for(int i = 0;i<=90;i++){
+    setARM(servo, i);
     delay(10);
   }
-  delay(2000);
+}
 
-  for(int i=140;i>30;i--){
-    setARM(servo3,i);
+void close_met(int servo){
+  setARM(servo, 90);
+  for(int i = 90;i>=0;i--){
+    setARM(servo, i);
     delay(10);
   }
-  delay(1000);
-  /*
-  servo.write(75);
-  delay(em_d);
-  
-  servo.write(90);
-  */
 }
-
-void pet(){
-  servo.write(113);
-  delay(pet_d);
-
-  servo.write(90);
-  delay(500);
-
-  int angle1 = 60;
-  int angle2 = 65;
-  for(;servo_angle1 <= angle1 || servo_angle2 <= angle2;servo_angle1++,servo_angle2++){
-    if(servo_angle1 <= angle1){
-      setARM(servo1,servo_angle1);
-    }
-    if(servo_angle2 <= angle2){
-      setARM(servo2,servo_angle2);
-    }
-    delay(15);
-  }
-  delay(1000);
-  
-  open_func();
-  delay(1000);
-  
-  servo.write(74);
-  delay(pet_d);
-  servo.write(90);
-  
-  delay(1000);
-}
-
-void pp(){
-  servo.write(75.5);
-  delay(pp_d);
-  
-  servo.write(90);
-  delay(500);
-
-  int angle1 = 60;
-  int angle2 = 65;
-  for(;servo_angle1 <= angle1 || servo_angle2 <= angle2;servo_angle1++,servo_angle2++){
-    if(servo_angle1 <= angle1){
-      setARM(servo1,servo_angle1);
-    }
-    if(servo_angle2 <= angle2){
-      setARM(servo2,servo_angle2);
-    }
-    delay(15);
-  }
-  delay(1000);
-  
-  open_func();
-  delay(1000);
-  
-  servo.write(108);
-  delay(pp_d);
-  servo.write(90);
-  delay(1000);
-}
-
-void ps(){  
-  servo.write(107.5);
-  delay(ps_d);
-  
-  servo.write(90);
-  delay(500);
-
-  int angle1 = 35;
-  int angle2 = 40;
-  for(;servo_angle1 >= angle1 || servo_angle2 >= angle2;servo_angle1--,servo_angle2--){
-    if(servo_angle1 >= angle1){
-      setARM(servo1,servo_angle1);
-    }
-    if(servo_angle2 >= angle2){
-      setARM(servo2,servo_angle2);
-    }
-    delay(15);
-  }
-  
-  delay(1000);
-  
-  open_func();
-  delay(1000);
-
-  servo.write(80);
-  delay(ps_d);
-  
-  servo.write(90);
-  delay(1000);
-}
-
 
 void setup() {
   Serial.begin(9600);
-  servo.attach(servo0);
-  servo.write(90);
 
   pinMode(TRIG, OUTPUT);
   pinMode(ECHO, INPUT);
@@ -182,9 +49,7 @@ void setup() {
   pwm.begin();
   pwm.setOscillatorFrequency(27000000);
   pwm.setPWMFreq(SERVO_FREQ);  // Analog servos run at ~50 Hz updates
-
-  center();
-  Serial.println("setting success");
+  servo_init();
 
   delay(10);
 }

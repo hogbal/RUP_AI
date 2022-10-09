@@ -1,8 +1,3 @@
-#include <ArduinoJson.h>
-#include <usbhid.h>
-#include <usbhub.h>
-#include <hiduniversal.h>
-#include <hidboot.h>
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
@@ -20,9 +15,9 @@ void setup(){
 
 
 void loop() {
-  for(int i=0;i<6;i++){
-    for(int value=SERVOMIN;value<SERVOMAX;value++){
-    pwm.setPWM(i,0,value);
-    }
-  }
+   for(int value=SERVOMIN;value<SERVOMAX;value++){
+      pwm.setPWM(0,0,value);
+      Serial.println(value);
+      delay(30);
+   }
 }
