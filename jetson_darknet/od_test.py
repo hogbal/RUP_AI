@@ -18,7 +18,7 @@ data_file = 'model/yolov4-tiny/obj.data'
 weights = 'model/yolov4-tiny/yolov4-tiny_best.weights'
 
 
-thresh = 0.25
+thresh = 0.3
 ext_output = False
 
 def convert2relative(bbox):

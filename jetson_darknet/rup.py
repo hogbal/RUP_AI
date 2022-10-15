@@ -1,6 +1,6 @@
-from asyncio.windows_events import NULL
 from ctypes import *
 import cv2
+import os
 import time
 import darknet
 import serial
@@ -18,7 +18,7 @@ data_file = 'model/yolov4-tiny/obj.data'
 weights = 'model/yolov4-tiny/yolov4-tiny_best.weights'
 '''
 
-thresh = 0.5
+thresh = 0.3
 ext_output = False
 
 network, class_names, class_colors = darknet.load_network(
@@ -38,8 +38,11 @@ ser_main = serial.Serial(
 #csi camera setting
 cap = load_camera.csi_camera()
 
+os.system("clear")
+print("setting success")
+
 def video_capture():
-    end = time.time() + 10
+    end = time.time() + 20
     
     while cap.isOpened() and time.time() < end:
         ret, frame = cap.read()
@@ -53,16 +56,22 @@ def video_capture():
         result, label = inference(img_for_detect)
         if(result):
             return label
+
+    return False
         
 def inference(darknet_image):
     prev_time = time.time()
     detections = darknet.detect_image(network, class_names, darknet_image, thresh=thresh)
+    print('detections : ',end='')
+    print(detections)
     darknet.free_image(darknet_image)
     labels = [detection[0] for detection in detections]
+    print('labels : ',end='')
+    print(labels)
     if(len(labels) == 1):
-        return True, labels
+        return True, labels[0]
     else:
-        return False, labels
+        return False, None
 
 if __name__ == '__main__':
     while(True):
@@ -72,14 +81,16 @@ if __name__ == '__main__':
             if(read_data == 'Detection\r'):
                 print("Detection start")
                 label = video_capture()
+                print("Detection end")
                 
-                if(detect == "pet"):
-                    detect = '1'
-                elif(detect == "pp"):
-                    detect = '2'
-                elif(detect == "ps"):
-                    detect = '3'
+                if(label == "pet"):
+                    label = '1'
+                elif(label == "pp"):
+                    label = '2'
+                elif(label == "ps"):
+                    label = '3'
                 else:
-                    detect = '0'
+                    label = '0'
                     
-                ser_main.write(detect.encode("utf-8"))
+                ser_main.write(label.encode("utf-8"))
+    cap.release()
