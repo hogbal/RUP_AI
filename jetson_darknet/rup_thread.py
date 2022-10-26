@@ -1,4 +1,5 @@
 from ctypes import *
+import numpy as np
 import random
 import cv2
 import time
@@ -11,12 +12,12 @@ from object_detection import load_camera
 
 config_file = 'model/yolov7-tiny/yolov7-tiny.cfg'
 data_file = 'model/yolov7-tiny/obj.data'
-weights = 'model/yolov7-tiny/yolov7-tiny_best.weights'
+weights = 'model/yolov7-tiny/yolov7-tiny_2000.weights'
 
 '''
-config_file = 'model/yolov4-tiny/yolov4-tiny.cfg'
-data_file = 'model/yolov4-tiny/obj.data'
-weights = 'model/yolov4-tiny/yolov4-tiny_best.weights'
+config_file = 'model/yolov7/yolov7.cfg'
+data_file = 'model/yolov7/obj.data'
+weights = 'model/yolov7/yolov7_2000.weights'
 '''
 
 thresh = 0.3
@@ -96,6 +97,13 @@ def video_capture(frame_queue, darknet_image_queue):
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame_resized = cv2.resize(frame_rgb, (darknet_width, darknet_height),
                                    interpolation=cv2.INTER_LINEAR)
+        
+		#val = 50
+        #BGR
+		#array = np.full(frame_resized.shape, (0, 0, val), dtype=np.uint8)
+		#frame_resized = cv2.add(frame_resized, array)
+
+		#frame_queue.put(frame_resized)
         frame_queue.put(frame)
         img_for_detect = darknet.make_image(darknet_width, darknet_height, 3)
         darknet.copy_image_from_bytes(img_for_detect, frame_resized.tobytes())
@@ -121,10 +129,15 @@ def inference(darknet_image_queue, detections_queue, fps_queue, label_queue):
 
 def drawing(frame_queue, detections_queue, fps_queue):
     random.seed(3)  # deterministic bbox colors
+    cv2.namedWindow('Inference', cv2.WND_PROP_FULLSCREEN)
+    cv2.setWindowProperty('Inference',cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+
     while cap.isOpened():
         frame = frame_queue.get()
         detections = detections_queue.get()
         fps = fps_queue.get()
+        if(fps == 0):
+            fps = 1
         detections_adjusted = []
         if frame is not None:
             for label, confidence, bbox in detections:
