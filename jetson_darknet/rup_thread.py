@@ -9,16 +9,13 @@ import os
 from threading import Thread, enumerate
 from queue import Queue
 from object_detection import load_camera
+from sqlalchemy import create_engine, Column, String, Integer
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 config_file = 'model/yolov7-tiny/yolov7-tiny.cfg'
 data_file = 'model/yolov7-tiny/obj.data'
 weights = 'model/yolov7-tiny/yolov7-tiny_2000.weights'
-
-'''
-config_file = 'model/yolov7/yolov7.cfg'
-data_file = 'model/yolov7/obj.data'
-weights = 'model/yolov7/yolov7_2000.weights'
-'''
 
 thresh = 0.3
 ext_output = False
@@ -40,6 +37,29 @@ ser_main = serial.Serial(
 
 #csi camera setting
 cap = load_camera.csi_camera()
+
+#Mariadb setting
+engine = create_engine("mariadb+mariadbconnector://root:root@hogbal.iptime.org:3306/rup_db")
+Base = declarative_base()
+
+class user_info(Base):
+    __tablename__ = "USER_INFO"
+    UID = Column(String(length=40), primary_key=True)
+    Password = Column(String(length=15), unique=True)
+    Nickname = Column(String(length=20))
+    Sex = Column(String(length=20), nullable=False)
+    Birth = Column(String(length=10), nullable=False)
+    Profile_photo_url = Column(String(length=100))
+    College = Column(String(length=100))
+    Major = Column(String(length=100))
+    Point = Column(Integer, default=0)
+    Count_recyle = Column(Integer, default=0)
+    
+Base.metadata.create_all(engine)
+
+Session = sessionmaker()
+Session.configure(bind=engine)
+session = Session()
 
 os.system("clear")
 print("setting success")
@@ -159,6 +179,11 @@ def label_check(label_queue):
         if(len(labels)== 1):
             return labels[0]
     return None
+
+def update_point(uid):
+    usr = session.query(user_info).get(uid)
+    usr.Point = usr.Point+1
+    session.commit()
 
 def arduino(label_queue):
     while(True):
