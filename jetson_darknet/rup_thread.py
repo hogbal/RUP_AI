@@ -2,10 +2,12 @@ from ctypes import *
 import numpy as np
 import random
 import cv2
+import json
 import time
 import darknet
 import serial
 import os
+import requests
 from threading import Thread, enumerate
 from queue import Queue
 from object_detection import load_camera
@@ -37,29 +39,6 @@ ser_main = serial.Serial(
 
 #csi camera setting
 cap = load_camera.csi_camera()
-
-#Mariadb setting
-engine = create_engine("mariadb+mariadbconnector://root:root@hogbal.iptime.org:3306/rup_db")
-Base = declarative_base()
-
-class user_info(Base):
-    __tablename__ = "USER_INFO"
-    UID = Column(String(length=40), primary_key=True)
-    Password = Column(String(length=15), unique=True)
-    Nickname = Column(String(length=20))
-    Sex = Column(String(length=20), nullable=False)
-    Birth = Column(String(length=10), nullable=False)
-    Profile_photo_url = Column(String(length=100))
-    College = Column(String(length=100))
-    Major = Column(String(length=100))
-    Point = Column(Integer, default=0)
-    Count_recyle = Column(Integer, default=0)
-    
-Base.metadata.create_all(engine)
-
-Session = sessionmaker()
-Session.configure(bind=engine)
-session = Session()
 
 os.system("clear")
 print("setting success")
@@ -147,7 +126,7 @@ def inference(darknet_image_queue, detections_queue, fps_queue, label_queue):
     cap.release()
 
 
-def drawing(frame_queue, detections_queue, fps_queue):
+def drawing(frame_queue, detections_queue, label_queue, fps_queue):
     random.seed(3)  # deterministic bbox colors
     cv2.namedWindow('Inference', cv2.WND_PROP_FULLSCREEN)
     cv2.setWindowProperty('Inference',cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
@@ -165,8 +144,19 @@ def drawing(frame_queue, detections_queue, fps_queue):
                 detections_adjusted.append((str(label), confidence, bbox_adjusted))
             image = darknet.draw_boxes(detections_adjusted, frame, class_colors)
             cv2.imshow('Inference', image)
-            if cv2.waitKey(fps) == 27:
+            
+            input = cv2.waitKey(fps)
+            if input == 27:
                 break
+            elif input == 113:
+                label_queue.get()
+                label_queue.put(['pet'])
+            elif input == 119:
+                label_queue.get()
+                label_queue.put(['pp'])
+            elif input == 101:
+                label_queue.get()
+                label_queue.put(['ps'])
     cap.release()
     cv2.destroyAllWindows()
 
@@ -179,11 +169,6 @@ def label_check(label_queue):
         if(len(labels)== 1):
             return labels[0]
     return None
-
-def update_point(uid):
-    usr = session.query(user_info).get(uid)
-    usr.Point = usr.Point+1
-    session.commit()
 
 def arduino(label_queue):
     while(True):
@@ -202,9 +187,29 @@ def arduino(label_queue):
                 elif(label == "ps"):
                     label = '3'
                 else:
+                    ser_main.write(label.encode("utf-8"))
                     label = '0'
+                    continue
                     
                 ser_main.write(label.encode("utf-8"))
+                
+                while(True):
+                    if(ser_main.readable()):
+                        main_res = ser_main.readline()
+                        read_data = main_res.decode()[:len(main_res)-1]
+                        if(read_data == 'End\r'):
+                            print('Point update start')
+                            # uid = input()
+                            uid = "d334cc4w"
+                            url="http://13.124.80.15/home/get-point-record"
+                            res = requests.post(url, json={'uid': uid, 'point': 1})
+                            result = json.loads(res.text)
+                            if(result):
+                                print('Point update success')
+                            else:
+                                print('Point update error')
+                            break
+                
     cap.release()
 
 if __name__ == '__main__':
@@ -218,5 +223,5 @@ if __name__ == '__main__':
     video_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     Thread(target=video_capture, args=(frame_queue, darknet_image_queue)).start()
     Thread(target=inference, args=(darknet_image_queue, detections_queue, fps_queue, label_queue)).start()
-    Thread(target=drawing, args=(frame_queue, detections_queue, fps_queue)).start()
+    Thread(target=drawing, args=(frame_queue, detections_queue, label_queue, fps_queue)).start()
     arduino(label_queue)
