@@ -9,9 +9,9 @@ Adafruit_PWMServoDriver pwm=Adafruit_PWMServoDriver();
 #define TRIG 10
 #define ECHO 11
 
-const int pet = 1;
-const int pp = 2;
-const int ps = 3;
+const int PET = 1;
+const int PP = 2;
+const int PS = 3;
 
 void setARM(int num,int angle){
   int value = map(angle,0,180,SERVOMIN,SERVOMAX);
@@ -19,9 +19,9 @@ void setARM(int num,int angle){
 }
 
 void servo_init(){
-  setARM(pet, 0);
-  setARM(pp, 0);
-  setARM(ps, 0);
+  setARM(PET, 10);
+  setARM(PP, 10);
+  setARM(PS, 10);
 }
 
 void open_met(int servo){
@@ -34,7 +34,7 @@ void open_met(int servo){
 
 void close_met(int servo){
   setARM(servo, 90);
-  for(int i = 90;i>=0;i--){
+  for(int i = 90;i>=10;i--){
     setARM(servo, i);
     delay(10);
   }
@@ -62,46 +62,34 @@ void loop() {
   delayMicroseconds(10);
   digitalWrite(TRIG,LOW);
 
+  bool detection = false;
   unsigned long duration = pulseIn(ECHO,HIGH);
   float distance = ((float)(340*duration)/10000)/2;
 
   if(distance <= 10){
     delay(500);
-    close_func();
-    delay(500);
     
-    empty();
     Serial.println("Detection");
 
+    int met = 0;
     while(true) {
       if(Serial.available()){
-        char data = Serial.read();
-        if(data == '1') {
-          pet();
+        met = Serial.read() - '0';
+        if(met != 0){
+          detection = true;
+          open_met(met);
+          delay(10000);
           break;
         }
-        else if(data == '2'){
-          pp();
-          break;
-        }
-        else if(data == '3'){
-          ps();
-          break;
-        }
-        else if(data == '0'){
-          //detect error
+        else if(met == 0){
           break;
         }
       }
     }
-    center();
-    while(true) {
-      if(Serial.available()){
-        char data = Serial.read();
-        if(data == 'e') {
-          break;
-        }
-      }
+    if(detection){
+      close_met(met);
+      detection = false;
+      Serial.println("End");
     }
   }
 }
