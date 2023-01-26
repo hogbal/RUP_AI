@@ -1,0 +1,5 @@
+classes = 3
+train  = data/AIHub/train.txt
+valid  = data/AIHub/test.txt
+names = data/AIHub/obj.names
+backup = backup/
