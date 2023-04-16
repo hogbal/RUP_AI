@@ -226,6 +226,18 @@ def drawing(frame_queue, detections_queue, label_queue, fps_queue):
             break
         elif(input_key == 13):
             detection_check = True
+        elif(input_key == ord('q')):
+            pwm.set_pwm(0, 0, servo_open)
+        elif(input_key == ord('a')):
+            pwm.set_pwm(0, 0, servo_close)
+        elif(input_key == ord('w')):
+            pwm.set_pwm(1, 0, servo_open)
+        elif(input_key == ord('s')):
+            pwm.set_pwm(1, 0, servo_close)
+        elif(input_key == ord('e')):
+            pwm.set_pwm(2, 0, servo_open)
+        elif(input_key == ord('d')):
+            pwm.set_pwm(2, 0, servo_close)
         
         if(input_phone_check):
             input_phone()
