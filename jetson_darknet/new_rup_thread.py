@@ -1,6 +1,6 @@
 from ctypes import *
 import numpy as np
-import random
+import re
 import cv2
 import json
 import time
@@ -10,18 +10,21 @@ import os
 import requests
 import Adafruit_PCA9685
 import time
+import pickle
 from threading import Thread, enumerate
 from queue import Queue
 from object_detection import load_camera
+from img.img import create_img, create_phone_img, create_info_img, create_result_img
 from sqlalchemy import create_engine, Column, String, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+# AI setting
 config_file = 'model/aihub/aihub_yolov7-tiny.cfg'
 data_file = 'model/aihub/obj.data'
 weights = 'model/aihub/aihub_yolov7-tiny_last.weights'
 
-thresh = 0.3
+thresh = 0.65
 ext_output = False
 
 network, class_names, class_colors = darknet.load_network(
@@ -41,76 +44,62 @@ servo_min    = 150 # min. pulse length
 servo_max    = 600 # max. pulse length
 servo_offset = 50
 
-servo_open = 350
+# servo_open = 350
+servo_open = 250
 servo_close = 100
 open_time = 5
 
-servo_pet = 0
-servo_pp = 1
-servo_ps = 2
+servo_plastic = 1
+servo_can = 0
+servo_paper = 2
+servo_glass = 2
+servo_pet = 1
 
 pwm.set_pwm_freq(60)
 
+pwm.set_pwm(servo_plastic, 0, servo_close)
+pwm.set_pwm(servo_can, 0, servo_close)
+pwm.set_pwm(servo_paper, 0, servo_close)
+pwm.set_pwm(servo_glass, 0, servo_close)
 pwm.set_pwm(servo_pet, 0, servo_close)
-pwm.set_pwm(servo_pp, 0, servo_close)
-pwm.set_pwm(servo_ps, 0, servo_close)
 
 
 #csi camera setting
 cap = load_camera.csi_camera()
 
+# pkl load and Img setting
+pkl_name = "./data/dict.pkl"
+number_data = dict()
+if(os.path.isfile(pkl_name)):
+    with open(pkl_name, "rb" ) as f:
+        number_data = pickle.load(f)
+
+base_font_size = 60
+main_img = create_img("쓰레기를 카메라에 인식시켜주세요.", base_font_size, 0.7)
+detection_img = create_img("쓰레기 식별 중입니다.", base_font_size, 0.7)
+can_img = create_img("캔", base_font_size, 0.7)
+plastic_img = create_img("플라스틱", base_font_size ,0.7)
+pet_img = create_img("페트", base_font_size ,0.7)
+paper_img = create_img("종이", base_font_size ,0.7)
+glass_img = create_img("유리", base_font_size, 0.7)
+input_img = create_img("번호를 입력해 주세요.", int(base_font_size*0.6), 0.65)
+
+output_img = main_img
+detection_check = False
+input_phone_check = False
+
 os.system("clear")
 print("setting success")
 
-def convert2relative(bbox):
-    """
-    YOLO format use relative coordinates for annotation
-    """
-    x, y, w, h  = bbox
-    _height     = darknet_height
-    _width      = darknet_width
-    return x/_width, y/_height, w/_width, h/_height
-
-
-def convert2original(image, bbox):
-    x, y, w, h = convert2relative(bbox)
-
-    image_h, image_w, __ = image.shape
-
-    orig_x       = int(x * image_w)
-    orig_y       = int(y * image_h)
-    orig_width   = int(w * image_w)
-    orig_height  = int(h * image_h)
-
-    bbox_converted = (orig_x, orig_y, orig_width, orig_height)
-
-    return bbox_converted
-
-
-def convert4cropping(image, bbox):
-    x, y, w, h = convert2relative(bbox)
-
-    image_h, image_w, __ = image.shape
-
-    orig_left    = int((x - w / 2.) * image_w)
-    orig_right   = int((x + w / 2.) * image_w)
-    orig_top     = int((y - h / 2.) * image_h)
-    orig_bottom  = int((y + h / 2.) * image_h)
-
-    if (orig_left < 0): orig_left = 0
-    if (orig_right > image_w - 1): orig_right = image_w - 1
-    if (orig_top < 0): orig_top = 0
-    if (orig_bottom > image_h - 1): orig_bottom = image_h - 1
-
-    bbox_cropping = (orig_left, orig_top, orig_right, orig_bottom)
-
-    return bbox_cropping
-
 def servo_controller(pin):
-	pwm.set_pwm(pin, 0, servo_open)
-	time.sleep(open_time)
-	pwm.set_pwm(pin, 0, servo_close)
-
+    pwm.set_pwm(pin, 0, servo_open)
+    time.sleep(open_time)
+    pwm.set_pwm(pin, 0, servo_close)
+    # for i in range(servo_close, servo_open, -1):
+    #     pwm.set_pwm(pin, 0, i)
+    # time.sleep(open_time)
+    # for i in range(servo_open, servo_close):
+    #     pwm.set_pwm(pin, 0, i)
 
 def video_capture(frame_queue, darknet_image_queue):
     while cap.isOpened():
@@ -143,9 +132,81 @@ def inference(darknet_image_queue, detections_queue, fps_queue, label_queue):
         darknet.free_image(darknet_image)
     cap.release()
 
+def input_phone():
+    global output_img
+    img = create_phone_img(input_img, "010-0000-0000", base_font_size, color=(204,204,204))
+    phone_num = ""
+            
+    while(True):
+        cv2.imshow("Inference", img)
+        num = cv2.waitKey(0)
+                
+        if(num == ord('0')):
+            phone_num += '0'
+        elif(num == ord('1')):
+            phone_num += '1'
+        elif(num == ord('2')):
+            phone_num += '2'
+        elif(num == ord('3')):
+            phone_num += '3'
+        elif(num == ord('4')):
+            phone_num += '4'
+        elif(num == ord('5')):
+            phone_num += '5'
+        elif(num == ord('6')):
+            phone_num += '6'
+        elif(num == ord('7')):
+            phone_num += '7'
+        elif(num == ord('8')):
+            phone_num += '8'
+        elif(num == ord('9')):
+            phone_num += '9'
+        elif(num == 8):
+            if(len(phone_num) != 0):
+                phone_num = phone_num[:-1]
+            if(len(phone_num) == 4 or len(phone_num) == 9):
+                phone_num = phone_num[:-1]
+        elif(num == 13):
+            if(re.match('010-\d{3,4}-\d{4}', phone_num)):
+                if(phone_num in number_data):
+                    number_data[phone_num] += 1
+                else:
+                    number_data[phone_num] = 1
+                            
+                with open(pkl_name, 'wb') as f:
+                    pickle.dump(number_data, f, pickle.HIGHEST_PROTOCOL)
+                            
+                img = create_info_img(f"{phone_num}님", f"적립현황 {number_data[phone_num]}p", base_font_size)
+                cv2.imshow("Inference", img)
+                cv2.waitKey(2000)
+                        
+                img = create_result_img(len(number_data), base_font_size)
+                cv2.imshow("Inference", img)
+                cv2.waitKey(2000)
+                        
+                img = main_img
+                break
+            else:
+                img = create_phone_img(input_img, phone_num, base_font_size, notice=True)
+                continue
+                
+        if(len(phone_num) == 4 or len(phone_num) == 9):
+            phone_num = phone_num[:-1] + '-' + phone_num[-1]
+                
+        img = create_phone_img(input_img, phone_num, base_font_size)
+    output_img = main_img
+
+def label_check(label_queue):
+    while(True):
+        labels = label_queue.get()
+        
+        if(len(labels)== 1):
+            return labels[0]
 
 def drawing(frame_queue, detections_queue, label_queue, fps_queue):
-    random.seed(3)  # deterministic bbox colors
+    global detection_check
+    global output_img
+    global input_phone_check
     cv2.namedWindow('Inference', cv2.WND_PROP_FULLSCREEN)
     cv2.setWindowProperty('Inference',cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
@@ -153,43 +214,54 @@ def drawing(frame_queue, detections_queue, label_queue, fps_queue):
         frame = frame_queue.get()
         detections = detections_queue.get()
         fps = fps_queue.get()
+
         if(fps == 0):
             fps = 1
-        detections_adjusted = []
-        if frame is not None:
-            for label, confidence, bbox in detections:
-                bbox_adjusted = convert2original(frame, bbox)
-                detections_adjusted.append((str(label), confidence, bbox_adjusted))
-            image = darknet.draw_boxes(detections_adjusted, frame, class_colors)
-            cv2.imshow('Inference', image)
-            
-            input = cv2.waitKey(fps)
-            if input == 27:
-                break
+        
+        cv2.imshow("Inference", output_img)
+        
+        input_key = cv2.waitKey(fps)
+        
+        if(input_key == 27):
+            break
+        elif(input_key == 13):
+            detection_check = True
+        
+        if(input_phone_check):
+            input_phone()
+            input_phone_check = False
+
     cap.release()
     cv2.destroyAllWindows()
 
-def label_check(label_queue):
-    end = time.time() + 20
-    
-    while time.time() < end:
-        labels = label_queue.get()
-        
-        if(len(labels)== 1):
-            return labels[0]
-    return None
-
 def flow(label_queue):
-    while(True):
-        label = label_check(label_queue)
+    global detection_check
+    global output_img
+    global input_phone_check
+    
+    while(cap.isOpened()):
+        if(detection_check):
+            output_img = detection_img
+            label = label_check(label_queue)
 
-        if(label == "plastic"):
-            servo_controller(servo_pet)
-        elif(label == "can"):
-            servo_controller(servo_pp)
-        elif(label == "glass"):
-            servo_controller(servo_ps)
-
+            if(label == "plastic"):
+                output_img = plastic_img
+                servo_controller(servo_plastic)
+            elif(label == "can"):
+                output_img = can_img
+                servo_controller(servo_can)
+            elif(label == "paper"):
+                output_img = paper_img
+                servo_controller(servo_paper)
+            elif(label == "glass"):
+                output_img = glass_img
+                servo_controller(servo_glass)
+            elif(label == "pet"):
+                output_img = pet_img
+                servo_controller(servo_pet)
+            
+            input_phone_check = True
+            detection_check = False
 
     cap.release()
 
@@ -202,6 +274,7 @@ if __name__ == '__main__':
 
     video_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     video_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
     Thread(target=video_capture, args=(frame_queue, darknet_image_queue)).start()
     Thread(target=inference, args=(darknet_image_queue, detections_queue, fps_queue, label_queue)).start()
     Thread(target=drawing, args=(frame_queue, detections_queue, label_queue, fps_queue)).start()

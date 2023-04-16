@@ -27,6 +27,7 @@ def gstreamer_pipeline(
 			)
 
 def csi_camera():
-	cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=2), cv2.CAP_GSTREAMER)
+	#cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=2), cv2.CAP_GSTREAMER)
+	cap = cv2.VideoCapture(2)
 	cap.set(cv2.CAP_PROP_BUFFERSIZE, 0)
 	return cap
