@@ -13,3 +13,7 @@ jetson nano 이미지
 
 - jetson nano는 NVIDIA에서 개발한 임베디드 장치로, GPU를 탑재해서 end-ponit에서 Deep Learning 모델이 작동하도록 설계된 장치입니다.
 - 학습된 YOLOv7 모델이 해당 장치에서 작동할 수 있도록 python 코드를 이용해서 개발하였습니다.
+
+## Android
+
+- 학습된 모델을 Android 스마트폰에서 작동하는지 테스트하기 위해 `https://github.com/haroonshakeel/tensorflow-yolov4-tflite` 링크를 참조해서 간단하게 개발을 진행했습니다.
